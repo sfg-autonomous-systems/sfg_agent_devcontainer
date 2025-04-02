@@ -4,8 +4,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "${SCRIPT_DIR}/env_file_utils"
 source "${SCRIPT_DIR}/print_utils"
 
-ENVIRONMENT_FILE="${SCRIPT_DIR}/../.env"
-
 set_up_mounted_directory() {
   print_info "> Set up a directory to be mounted inside the dev container."
   print_warning "Note that if you change the directory to be mounted, you will need to rebuild the container for the changes to take effect."
@@ -98,9 +96,23 @@ forward_jtop_gid()
   print_info "< Done jtop GID."
 }
 
+execute_user_initialize_command() {
+    USER_INITIALIZE_COMMAND="${LOCAL_DEVCONTAINER_USER_DIRECTORY}/user_initialize_command.sh"
+
+    if [ -f "${USER_INITIALIZE_COMMAND}" ]; then
+        print_info "> Executing user initialize command '${USER_INITIALIZE_COMMAND}'."
+        bash "${USER_INITIALIZE_COMMAND}" ${@}
+        print_info "< Done executing user initialize command '${USER_INITIALIZE_COMMAND}'."
+    fi
+}
+
+LOCAL_DEVCONTAINER_USER_DIRECTORY="${2}"
+ENVIRONMENT_FILE="${LOCAL_DEVCONTAINER_USER_DIRECTORY}/.env"
+
 print_plain ""
 set_up_mounted_directory
 forward_environment_variables ${@}
 forward_user
 forward_platform
 forward_jtop_gid
+execute_user_initialize_command ${@}

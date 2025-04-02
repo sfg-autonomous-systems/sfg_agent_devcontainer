@@ -1,14 +1,19 @@
 {
-    "name": "Go2",
-    "dockerComposeFile": "${localWorkspaceFolder}/compose.yml",
+    "name": "Isaac ROS",
+    "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer-user/compose.yml",
     "service": "container",
     "overrideCommand": true,
     "workspaceFolder": "/workspaces",
     "initializeCommand": [
-        ".devcontainer/scripts/initialize_command",
-        "MOUNT_POINT=${containerWorkspaceFolder}/mounted_directory",
-        "REPOSITORY_DIRECTORY=${containerWorkspaceFolder}/go2",
-        "WORKSPACE_DIRECTORY=${containerWorkspaceFolder}"
+        "${localWorkspaceFolder}/.devcontainer/scripts/initialize_command",
+        // Local paths.
+        "LOCAL_WORKSPACE_DIRECTORY=${localWorkspaceFolder}",
+        "LOCAL_DEVCONTAINER_USER_DIRECTORY=${localWorkspaceFolder}/.devcontainer-user",
+        // Container paths and mount points.
+        "CONTAINER_WORKSPACE_DIRECTORY=${containerWorkspaceFolder}",
+        "CONTAINER_REPOSITORY_MOUNT_POINT=${containerWorkspaceFolder}/repository",
+        "CONTAINER_DEVCONTAINER_USER_DIRECTORY=${containerWorkspaceFolder}/repository/.devcontainer-user",
+        "CONTAINER_SELECTED_DIRECTORY_MOUNT_POINT=${containerWorkspaceFolder}/selected_directory"
     ],
     "postStartCommand": [
         "${containerEnv:REPOSITORY_DIRECTORY}/.devcontainer/scripts/post_start_command"

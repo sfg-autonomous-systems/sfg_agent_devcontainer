@@ -2,9 +2,9 @@
 
 In order to integrate this dev container into your project follow the steps below:
 
-1.  Add this repository to your project root (the directory you open in VS Code) with
+1.  Add this repository to your project root as a submodule (the directory you open in VS Code) with
     ```
-        git clone <url> .devcontainer
+        git submodule add <url> .devcontainer
     ```
 2. Create a top level `compose.yml` file. For reference the minimum `compose.yml` file is
     ```yaml

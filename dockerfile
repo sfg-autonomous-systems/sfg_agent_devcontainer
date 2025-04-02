@@ -7,7 +7,9 @@ FROM base-${PLATFORM}
 # Use bash as shell.
 SHELL ["/bin/bash", "-c"]
 
-ARG PLATFORM REPOSITORY_DIRECTORY WORKSPACE_DIRECTORY
+ARG PLATFORM 
+ARG LOCAL_DEVCONTAINER_USER_DIRECTORY 
+ARG CONTAINER_REPOSITORY_MOUNT_POINT CONTAINER_WORKSPACE_DIRECTORY 
 
 USER root
 
@@ -59,7 +61,7 @@ RUN CONFLICTING_GROUPNAME=$(getent group "${USER_GID}" | cut -d: -f1) && \
 # Activate the previously created user.
 USER "${USERNAME}"
 # Set our working directory.
-WORKDIR "${WORKSPACE_DIRECTORY}"
+WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
 # Ensure we can read/write to the working directory.
 RUN sudo chmod a+rwx "."
 
@@ -67,9 +69,20 @@ RUN sudo chmod a+rwx "."
 # Setup ROS2.                                                                                           #
 #########################################################################################################
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> "${HOME}/.bashrc" && \
-    ln -s "${REPOSITORY_DIRECTORY}/.devcontainer/.vscode" "${WORKSPACE_DIRECTORY}" && \
+    ln -s "${CONTAINER_REPOSITORY_MOUNT_POINT}/.devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     mkdir -p "${HOME}/.colcon" && \
     echo "build: {mixin: [compile-commands]}" >> "${HOME}/.colcon/defaults.yaml" && \
-    echo "[ -f ${REPOSITORY_DIRECTORY}/colcon_ws/install/setup.bash ] && source ${REPOSITORY_DIRECTORY}/colcon_ws/install/setup.bash" >> "/home/${USERNAME}/.bashrc"
+    echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >> "/home/${USERNAME}/.bashrc"
+
+#########################################################################################################
+# Install user dependencies.                                                                            #
+#########################################################################################################
+COPY "${LOCAL_DEVCONTAINER_USER_DIRECTORY}" "/tmp/.devcontainer-user"
+
+RUN if [ -f "/tmp/user_install_dependencies.sh" ]; then \
+        chmod +x "/tmp/user_install_dependencies.sh" && \
+        "/tmp/user_install_dependencies.sh" && \
+        rm "/tmp/user_install_dependencies.sh"; \
+    fi 
