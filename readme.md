@@ -21,7 +21,8 @@ In order to integrate this dev container into your project follow the steps belo
     ```
     .
     ├── .devcontainer                       # This repository as a git submodule.
-    ├── .devcontainer-user/                 # User configuration to customize the ISAAC ROS dev container
+    ├── .devcontainer-user/                 # User configuration to customize the ISAAC ROS dev container.
+    │   ├── .gitingnore                     # Contents should be ".env".
     │   ├── compose.yml
     │   ├── user_initialize_command
     │   ├── user_install_dependencies

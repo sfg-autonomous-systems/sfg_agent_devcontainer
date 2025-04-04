@@ -7,8 +7,14 @@ FROM base-${PLATFORM}
 # Use bash as shell.
 SHELL ["/bin/bash", "-c"]
 
-ARG PLATFORM=arm64 
-ARG CONTAINER_REPOSITORY_MOUNT_POINT CONTAINER_WORKSPACE_DIRECTORY 
+ARG PLATFORM=arm64
+ENV PLATFORM=${PLATFORM}
+
+ARG CONTAINER_WORKSPACE_DIRECTORY 
+ENV WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
+
+ARG CONTAINER_REPOSITORY_MOUNT_POINT 
+ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 
 USER root
 
@@ -16,11 +22,11 @@ USER root
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
 RUN --mount=type=cache,target="/var/cache/apt" \
-    apt update && apt-get install -y --no-install-recommends --allow-downgrades \
+    apt update && apt install -y --no-install-recommends --allow-downgrades \
         iproute2 \
+        iperf3 \
         usbutils \
-        python3-colcon-mixin \
-        v4l-utils \
+        python3-colcon-mixin && \
     apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
 
 #########################################################################################################

@@ -8,7 +8,7 @@ execute_user_post_start_command() {
 
     if [ -f "${USER_POST_START_COMMAND}" ]; then
         print_info "> Executing user post start command '${USER_POST_START_COMMAND}'."
-        bash "${USER_POST_START_COMMAND}"
+        "${USER_POST_START_COMMAND}"
         print_info "< Done executing user post start command '${USER_POST_START_COMMAND}'."
     fi
 }
