@@ -1,4 +1,4 @@
-ARG PLATFORM
+ARG PLATFORM=arm64
 
 FROM --platform=arm64 nvcr.io/nvidia/isaac/ros:aarch64-ros2_humble_fd3cefe09df8d19bf6cc82b0d57de78d AS base-arm64
 FROM --platform=amd64 nvcr.io/nvidia/isaac/ros:x86_64-ros2_humble_79152baed139e9f4258734f3056c263a AS base-amd64
@@ -7,8 +7,7 @@ FROM base-${PLATFORM}
 # Use bash as shell.
 SHELL ["/bin/bash", "-c"]
 
-ARG PLATFORM 
-ARG LOCAL_DEVCONTAINER_USER_DIRECTORY 
+ARG PLATFORM=arm64 
 ARG CONTAINER_REPOSITORY_MOUNT_POINT CONTAINER_WORKSPACE_DIRECTORY 
 
 USER root
@@ -35,12 +34,11 @@ RUN pip install \
 # Apply patches.                                                                                        #
 #########################################################################################################
 WORKDIR "/"
-COPY ".devcontainer/patches" "/tmp/patches"
 
-RUN for PATCH in "/tmp/patches/"*.patch; do \
+RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
+    for PATCH in "/tmp/patches/"*.patch; do \
         patch -p1 < "${PATCH}"; \
-    done && \
-    rm -rf "/tmp/patches"
+    done
 
 #########################################################################################################
 # Create a non-root user:                                                                               #
@@ -58,10 +56,10 @@ RUN CONFLICTING_GROUPNAME=$(getent group "${USER_GID}" | cut -d: -f1) && \
     chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
     usermod -aG video,plugdev,sudo "${USERNAME}"
 
-# Activate the previously created user.
-USER "${USERNAME}"
 # Set our working directory.
 WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
+# Activate the previously created user.
+USER "${USERNAME}"
 # Ensure we can read/write to the working directory.
 RUN sudo chmod a+rwx "."
 
@@ -79,10 +77,11 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> "${HOME}/.bashrc" && \
 #########################################################################################################
 # Install user dependencies.                                                                            #
 #########################################################################################################
-COPY "${LOCAL_DEVCONTAINER_USER_DIRECTORY}" "/tmp/.devcontainer-user"
+COPY ".devcontainer-user" "/tmp/.devcontainer-user"
 
-RUN if [ -f "/tmp/user_install_dependencies.sh" ]; then \
-        chmod +x "/tmp/user_install_dependencies.sh" && \
-        "/tmp/user_install_dependencies.sh" && \
-        rm "/tmp/user_install_dependencies.sh"; \
-    fi 
+RUN --mount=type=cache,target="/var/cache/apt" \
+    if [ -f "/tmp/.devcontainer-user/user_install_dependencies" ]; then \
+        sudo chmod +x "/tmp/.devcontainer-user/user_install_dependencies" && \
+        "/tmp/.devcontainer-user/user_install_dependencies" \
+        sudo apt -y autoremove && sudo apt clean autoclean && sudo rm -rf "/var/lib/apt/lists/*"; \
+    fi

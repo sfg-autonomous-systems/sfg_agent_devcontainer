@@ -20,4 +20,4 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all
     group_add:
-      - ${JTOP_GID}
+      - ${LOCAL_JTOP_GID}

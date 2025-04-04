@@ -8,12 +8,8 @@
         "${localWorkspaceFolder}/.devcontainer/scripts/initialize_command",
         // Local paths.
         "LOCAL_WORKSPACE_DIRECTORY=${localWorkspaceFolder}",
-        "LOCAL_DEVCONTAINER_USER_DIRECTORY=${localWorkspaceFolder}/.devcontainer-user",
         // Container paths and mount points.
-        "CONTAINER_WORKSPACE_DIRECTORY=${containerWorkspaceFolder}",
-        "CONTAINER_REPOSITORY_MOUNT_POINT=${containerWorkspaceFolder}/repository",
-        "CONTAINER_DEVCONTAINER_USER_DIRECTORY=${containerWorkspaceFolder}/repository/.devcontainer-user",
-        "CONTAINER_SELECTED_DIRECTORY_MOUNT_POINT=${containerWorkspaceFolder}/selected_directory"
+        "CONTAINER_WORKSPACE_DIRECTORY=${containerWorkspaceFolder}"
     ],
     "postStartCommand": [
         "${containerEnv:REPOSITORY_DIRECTORY}/.devcontainer/scripts/post_start_command"

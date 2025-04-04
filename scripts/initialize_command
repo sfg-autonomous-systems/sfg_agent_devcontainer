@@ -4,11 +4,15 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "${SCRIPT_DIR}/env_file_utils"
 source "${SCRIPT_DIR}/print_utils"
 
+LOCAL_WORKSPACE_DIRECTORY="${1#*=}"
+CONTAINTER_WORKSPACE_DIRECTORY="${2#*=}"
+ENVIRONMENT_FILE="${LOCAL_WORKSPACE_DIRECTORY}/.devcontainer-user/.env"
+
 set_up_mounted_directory() {
   print_info "> Set up a directory to be mounted inside the dev container."
   print_warning "Note that if you change the directory to be mounted, you will need to rebuild the container for the changes to take effect."
 
-  local ENVIRONMENT_VARIABLE="SELECTED_DIRECTORY"
+  local ENVIRONMENT_VARIABLE="LOCAL_SELECTED_DIRECTORY"
   local VALUE=$(get_environment_variable "${ENVIRONMENT_FILE}" "${ENVIRONMENT_VARIABLE}")
 
   if [[ ! -z "${VALUE}" ]]; then
@@ -37,9 +41,16 @@ set_up_mounted_directory() {
   fi
 
   # Save the selected directory in an environment variable. This will later be leveraged
-  # by the docker-compose.yml to mount the specified directory inside the container.
+  # by docker compose to mount the specified directory inside the container.
   set_environment_variable "${ENVIRONMENT_FILE}" "${ENVIRONMENT_VARIABLE}" "${VALUE}"
+  set_environment_variable "${ENVIRONMENT_FILE}" "CONTAINER_SELECTED_DIRECTORY_MOUNT_POINT" "${CONTAINTER_WORKSPACE_DIRECTORY}/$(basename ${VALUE})"
   print_info "< Done setting up a directory to be mounted inside the dev container."
+}
+
+setup_repository() {
+  print_info "> Set up repository inside container."
+  set_environment_variable "${ENVIRONMENT_FILE}" "CONTAINER_REPOSITORY_MOUNT_POINT" "${CONTAINTER_WORKSPACE_DIRECTORY}/$(basename ${LOCAL_WORKSPACE_DIRECTORY})"
+  print_info "< Done setting up repository inside container."
 }
 
 forward_environment_variables() {
@@ -59,9 +70,9 @@ forward_environment_variables() {
 
 forward_user() {
   print_info "> Forwarding user."
-  set_environment_variable "${ENVIRONMENT_FILE}" "USERNAME" "${USER}"
-  set_environment_variable "${ENVIRONMENT_FILE}" "USER_UID" "$(id -u ${USER})"
-  set_environment_variable "${ENVIRONMENT_FILE}" "USER_GID" "$(id -g ${USER})"
+  set_environment_variable "${ENVIRONMENT_FILE}" "LOCAL_USERNAME" "${USER}"
+  set_environment_variable "${ENVIRONMENT_FILE}" "LOCAL_USER_UID" "$(id -u ${USER})"
+  set_environment_variable "${ENVIRONMENT_FILE}" "LOCAL_USER_GID" "$(id -g ${USER})"
   print_info "< Done forwarding user."
 }
 
@@ -90,14 +101,14 @@ forward_jtop_gid()
   print_info "> Forwarding jtop GID."
 
   if [ -S "/run/jtop.sock" ]; then
-      set_environment_variable "${ENVIRONMENT_FILE}" "JTOP_GID" "$(stat -c %g /run/jtop.sock)"
+      set_environment_variable "${ENVIRONMENT_FILE}" "LOCAL_JTOP_GID" "$(stat -c %g /run/jtop.sock)"
   fi
 
   print_info "< Done jtop GID."
 }
 
 execute_user_initialize_command() {
-    USER_INITIALIZE_COMMAND="${LOCAL_DEVCONTAINER_USER_DIRECTORY}/user_initialize_command.sh"
+    USER_INITIALIZE_COMMAND="${LOCAL_WORKSPACE_DIRECTORY}/.devcontainer-user/user_initialize_command"
 
     if [ -f "${USER_INITIALIZE_COMMAND}" ]; then
         print_info "> Executing user initialize command '${USER_INITIALIZE_COMMAND}'."
@@ -106,11 +117,9 @@ execute_user_initialize_command() {
     fi
 }
 
-LOCAL_DEVCONTAINER_USER_DIRECTORY="${2}"
-ENVIRONMENT_FILE="${LOCAL_DEVCONTAINER_USER_DIRECTORY}/.env"
-
 print_plain ""
 set_up_mounted_directory
+setup_repository
 forward_environment_variables ${@}
 forward_user
 forward_platform
