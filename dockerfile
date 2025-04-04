@@ -21,14 +21,7 @@ RUN --mount=type=cache,target="/var/cache/apt" \
         usbutils \
         python3-colcon-mixin \
         v4l-utils \
-        # Fix taken from "https://github.com/IntelRealSense/realsense-ros/issues/3203" for error during colcon build: 
-        # The imported target "opencv_core" references the file "/usr/lib/libopencv_core.so.4.8.0" but this file does not exist.
-        libopencv-dev=4.5.4+dfsg-9ubuntu4 && \
     apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
-
-RUN pip install \
-        python-can \
-        piper_sdk
 
 #########################################################################################################
 # Apply patches.                                                                                        #
