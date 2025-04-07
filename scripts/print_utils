@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-indent() { 
+indent() {
     sed 's/^/  /'
 }
 

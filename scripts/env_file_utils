@@ -28,7 +28,7 @@ set_environment_variable() {
   if [ "${LINE_NUMBER}" -ne -1 ]; then
     sed -i "${LINE_NUMBER} c\\${ENVIRONMENT_VARIABLE}=${VALUE}" "${ENVIRONMENT_FILE}"
   else
-    echo "${ENVIRONMENT_VARIABLE}=${VALUE}" >> "${ENVIRONMENT_FILE}"
+    echo "${ENVIRONMENT_VARIABLE}=${VALUE}" >>"${ENVIRONMENT_FILE}"
   fi
 }
 

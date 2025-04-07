@@ -8,14 +8,8 @@ In order to integrate this dev container into your project follow the steps belo
     |:--------:|-----------------------------------------------------------------------------------------------------------------------------------------|
     | HTTPS    | `git submodule add https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/isaac-ros-dev-container.git .devcontainer` |
     | SSH      | `git submodule add git@gitlab.hs-esslingen.de:smart-factory-grids/autonomous-systems/tools/isaac-ros-dev-container.git .devcontainer`     |
-    
-2. Create a `.devcontainer-user/compose.yml` file containing
-    ```yaml
-    include:
-    - path:
-        - .devcontainer/compose/compose.base.yml
-        - .devcontainer/compose/compose.${PLATFORM}.yml
-    ```
+
+2. Execute `.devcontainer/scripts/create_devcontainer_user_directory` to create the integration files required at the root of your project.
 
 3. Additional configuration such as executing code before the image is build, installing custom dependencies inside the container's image, or executing code when the container is started can be achieved with `user_initialize_command`, `user_install_dependencies`, and `user_post_start_command`, respectively. For reference the full directory structure is shown below.
     ```
