@@ -78,7 +78,7 @@ USER "${USERNAME}"
 # Ensure we can read/write to the working directory.
 RUN sudo chmod a+rwx "." && \
     # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
-    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
+    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >> "/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >> "/home/${USERNAME}/.profile" || true
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
