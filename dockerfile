@@ -35,32 +35,50 @@ RUN --mount=type=cache,target="/var/cache/apt" \
 WORKDIR "/"
 
 RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
-    for PATCH in "/tmp/patches/"*.patch; do \
-        patch -p1 < "${PATCH}"; \
+    for PATCH in "/tmp/patches/${PLATFORM}"*.patch; do \
+        # Check if the patch file actually exists (glob might return the pattern if no files match).
+        [ -f "${PATCH}" ] || continue; \
+        patch -p1 --forward < "${PATCH}"; \
     done
 
 #########################################################################################################
-# Create a non-root user:                                                                               #
-# - https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user#_creating-a-nonroot-user.  #
+# Create a non-root user.                                                                               #
 #########################################################################################################
 ARG USERNAME=developer
 ENV USERNAME=${USERNAME}
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 
-RUN CONFLICTING_GROUPNAME=$(getent group "${USER_GID}" | cut -d: -f1) && \
-    groupmod -o --gid "${USER_GID}" -n "${USERNAME}" "${CONFLICTING_GROUPNAME}" && \
-    useradd --no-log-init --uid "${USER_UID}" --gid "${USER_GID}" -m "${USERNAME}" && \
+RUN if [ ! $(getent group "${USER_GID}") ]; then \
+        groupadd --gid "${USER_GID}" "${USERNAME}" &>"/dev/null"; \
+    else \
+        CONFLICTING_GROUPNAME=`getent group "${USER_GID}" | cut -d: -f1` && \
+        groupmod -o --gid "${USER_GID}" -n "${USERNAME}" "${CONFLICTING_GROUPNAME}"; \
+    fi; \
+    \
+    if [ ! $(getent passwd "${USER_UID}") ]; then \
+        useradd --no-log-init --uid "${USER_UID}" --gid "${USER_GID}" -m "${USERNAME}" &>"/dev/null"; \
+    else \
+        CONFLICTING_USERNAME=`getent passwd "${USER_UID}" | cut -d: -f1` && \
+        usermod -l "${USERNAME}" -u "${USER_UID}" -m -d "/home/${USERNAME}" "${CONFLICTING_USERNAME}" &>"/dev/null" && \
+        mkdir -p "/home/${USERNAME}" && \
+        # Wipe files that may create issues for users with large uid numbers.
+        rm -f "/var/log/lastlog /var/log/faillog"; \ 
+    fi; \
+    \
+    chown "${USERNAME}":"${USERNAME}" "/home/${USERNAME}" && \
     echo "${USERNAME}" ALL=\(root\) NOPASSWD:ALL > "/etc/sudoers.d/${USERNAME}" && \
     chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
-    usermod -aG video,plugdev,sudo "${USERNAME}"
+    usermod -aG video,plugdev,sudo "${USERNAME}";
 
 # Set our working directory.
 WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
 # Activate the previously created user.
 USER "${USERNAME}"
 # Ensure we can read/write to the working directory.
-RUN sudo chmod a+rwx "."
+RUN sudo chmod a+rwx "." && \
+    # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
+    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
