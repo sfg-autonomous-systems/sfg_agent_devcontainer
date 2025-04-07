@@ -35,7 +35,7 @@ RUN --mount=type=cache,target="/var/cache/apt" \
 WORKDIR "/"
 
 RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
-    for PATCH in "/tmp/patches/${PLATFORM}"*.patch; do \
+    for PATCH in "/tmp/patches/${PLATFORM}/"*.patch; do \
         # Check if the patch file actually exists (glob might return the pattern if no files match).
         [ -f "${PATCH}" ] || continue; \
         patch -p1 --forward < "${PATCH}"; \
