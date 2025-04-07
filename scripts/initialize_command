@@ -112,7 +112,7 @@ execute_user_initialize_command() {
 
   if [ -f "${USER_INITIALIZE_COMMAND}" ]; then
     print_info "> Executing user initialize command '${USER_INITIALIZE_COMMAND}'."
-    bash "${USER_INITIALIZE_COMMAND}" ${@}
+    "${USER_INITIALIZE_COMMAND}" ${@}
     print_info "< Done executing user initialize command '${USER_INITIALIZE_COMMAND}'."
   fi
 }
