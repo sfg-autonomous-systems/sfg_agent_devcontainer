@@ -61,7 +61,6 @@
                 "ms-azuretools.vscode-docker",
                 "eamodio.gitlens",
                 "GitHub.copilot",
-                "foxundermoon.shell-format",
                 // Python extensions.
                 "njpwerner.autodocstring",
                 "ms-python.python",

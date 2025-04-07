@@ -67,7 +67,7 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
     fi; \
     \
     chown "${USERNAME}":"${USERNAME}" "/home/${USERNAME}" && \
-    echo "${USERNAME}" ALL=\(root\) NOPASSWD:ALL > "/etc/sudoers.d/${USERNAME}" && \
+    echo "${USERNAME}" ALL=\(root\) NOPASSWD:ALL >"/etc/sudoers.d/${USERNAME}" && \
     chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
     usermod -aG video,plugdev,sudo "${USERNAME}";
 
@@ -78,18 +78,18 @@ USER "${USERNAME}"
 # Ensure we can read/write to the working directory.
 RUN sudo chmod a+rwx "." && \
     # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
-    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >> "/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >> "/home/${USERNAME}/.profile" || true
+    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
 #########################################################################################################
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> "${HOME}/.bashrc" && \
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
     ln -s "${CONTAINER_REPOSITORY_MOUNT_POINT}/.devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     mkdir -p "${HOME}/.colcon" && \
-    echo "build: {mixin: [compile-commands]}" >> "${HOME}/.colcon/defaults.yaml" && \
-    echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >> "/home/${USERNAME}/.bashrc"
+    echo "build: {mixin: [compile-commands]}" >>"${HOME}/.colcon/defaults.yaml" && \
+    echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >>"/home/${USERNAME}/.bashrc"
 
 #########################################################################################################
 # Install user dependencies.                                                                            #
