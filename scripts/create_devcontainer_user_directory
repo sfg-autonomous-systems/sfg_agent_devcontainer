@@ -22,6 +22,7 @@ create_devcontainer_user_directory() {
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_install_dependencies"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
+    chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
     print_info "< Done creating devcontainer user directory."
 }
 
