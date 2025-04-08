@@ -10,10 +10,10 @@ SHELL ["/bin/bash", "-c"]
 ARG PLATFORM=arm64
 ENV PLATFORM=${PLATFORM}
 
-ARG CONTAINER_WORKSPACE_DIRECTORY 
+ARG CONTAINER_WORKSPACE_DIRECTORY
 ENV WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
 
-ARG CONTAINER_REPOSITORY_MOUNT_POINT 
+ARG CONTAINER_REPOSITORY_MOUNT_POINT
 ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 
 USER root
@@ -38,7 +38,7 @@ RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
     for PATCH in "/tmp/patches/${PLATFORM}/"*.patch; do \
         # Check if the patch file actually exists (glob might return the pattern if no files match).
         [ -f "${PATCH}" ] || continue; \
-        patch -p1 --forward < "${PATCH}"; \
+        patch -p1 --forward <"${PATCH}"; \
     done
 
 #########################################################################################################
@@ -63,7 +63,7 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
         usermod -l "${USERNAME}" -u "${USER_UID}" -m -d "/home/${USERNAME}" "${CONFLICTING_USERNAME}" &>"/dev/null" && \
         mkdir -p "/home/${USERNAME}" && \
         # Wipe files that may create issues for users with large uid numbers.
-        rm -f "/var/log/lastlog /var/log/faillog"; \ 
+        rm -f "/var/log/lastlog /var/log/faillog"; \
     fi; \
     \
     chown "${USERNAME}":"${USERNAME}" "/home/${USERNAME}" && \

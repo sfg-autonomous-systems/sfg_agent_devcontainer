@@ -33,6 +33,18 @@
                     }
                 },
                 "docker.languageserver.formatter.ignoreMultilineInstructions": true,
+                "shellformat.effectLanguages": [
+                    "shellscript",
+                    "dotenv",
+                    "hosts",
+                    "jvmoptions",
+                    "ignore",
+                    "gitignore",
+                    "properties",
+                    "spring-boot-properties",
+                    "azcli",
+                    "bats"
+                ],
                 // Python settings.
                 "python.languageServer": "Pylance",
                 "python.analysis.extraPaths": [
@@ -61,6 +73,7 @@
                 "ms-azuretools.vscode-docker",
                 "eamodio.gitlens",
                 "GitHub.copilot",
+                "foxundermoon.shell-format",
                 // Python extensions.
                 "njpwerner.autodocstring",
                 "ms-python.python",
