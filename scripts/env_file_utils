@@ -9,24 +9,24 @@ get_line_number_of_environment_variable() {
     return
   fi
 
-  local LINE_NUMBER=$(grep -n "^${ENVIRONMENT_VARIABLE}=" "${ENVIRONMENT_FILE}" | cut -d: -f1)
+  local line_number=$(grep -n "^${ENVIRONMENT_VARIABLE}=" "${ENVIRONMENT_FILE}" | cut -d: -f1)
 
-  if [ -z "${LINE_NUMBER}" ]; then
+  if [ -z "${line_number}" ]; then
     echo -1
     return
   fi
 
-  echo ${LINE_NUMBER}
+  echo ${line_number}
 }
 
 set_environment_variable() {
   local ENVIRONMENT_FILE=${1}
   local ENVIRONMENT_VARIABLE=${2}
   local VALUE=${3}
-  local LINE_NUMBER=$(get_line_number_of_environment_variable "${ENVIRONMENT_FILE}" "${ENVIRONMENT_VARIABLE}")
+  local line_number=$(get_line_number_of_environment_variable "${ENVIRONMENT_FILE}" "${ENVIRONMENT_VARIABLE}")
 
-  if [ "${LINE_NUMBER}" -ne -1 ]; then
-    sed -i "${LINE_NUMBER} c\\${ENVIRONMENT_VARIABLE}=${VALUE}" "${ENVIRONMENT_FILE}"
+  if [ "${line_number}" -ne -1 ]; then
+    sed -i "${line_number} c\\${ENVIRONMENT_VARIABLE}=${VALUE}" "${ENVIRONMENT_FILE}"
   else
     echo "${ENVIRONMENT_VARIABLE}=${VALUE}" >>"${ENVIRONMENT_FILE}"
   fi
