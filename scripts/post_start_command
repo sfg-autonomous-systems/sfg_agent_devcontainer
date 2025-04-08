@@ -13,4 +13,5 @@ execute_user_post_start_command() {
     fi
 }
 
+print_plain ""
 execute_user_post_start_command
