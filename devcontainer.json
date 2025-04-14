@@ -1,7 +1,7 @@
 {
     "name": "Isaac ROS",
     "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer-user/compose.yml",
-    "service": "container",
+    "service": "devcontainer",
     "overrideCommand": true,
     "workspaceFolder": "/workspaces",
     "initializeCommand": [
@@ -74,6 +74,8 @@
                 "eamodio.gitlens",
                 "GitHub.copilot",
                 "foxundermoon.shell-format",
+                "redhat.vscode-xml",
+                "redhat.vscode-yaml",
                 // Python extensions.
                 "njpwerner.autodocstring",
                 "ms-python.python",

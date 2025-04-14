@@ -1,4 +1,4 @@
 services:
-  container:
+  devcontainer:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all

@@ -10,6 +10,9 @@ SHELL ["/bin/bash", "-c"]
 ARG PLATFORM=arm64
 ENV PLATFORM=${PLATFORM}
 
+ARG ROS_DOMAIN_ID
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+
 ARG CONTAINER_WORKSPACE_DIRECTORY
 ENV WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
 
@@ -21,7 +24,7 @@ USER root
 #########################################################################################################
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
-RUN --mount=type=cache,target="/var/cache/apt" \
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     apt update && apt install -y --no-install-recommends --allow-downgrades \
         iproute2 \
         iperf3 \
@@ -91,12 +94,14 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
     echo "build: {mixin: [compile-commands]}" >>"${HOME}/.colcon/defaults.yaml" && \
     echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >>"/home/${USERNAME}/.bashrc"
 
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+
 #########################################################################################################
 # Install user dependencies.                                                                            #
 #########################################################################################################
 COPY ".devcontainer-user" "/tmp/.devcontainer-user"
 
-RUN --mount=type=cache,target="/var/cache/apt" \
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     if [ -f "/tmp/.devcontainer-user/user_install_dependencies" ]; then \
         sudo chmod +x "/tmp/.devcontainer-user/user_install_dependencies" && \
         "/tmp/.devcontainer-user/user_install_dependencies" \

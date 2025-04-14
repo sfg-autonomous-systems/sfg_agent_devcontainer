@@ -1,12 +1,13 @@
 services:
-  container:
+  devcontainer:
     build:
       context: "${LOCAL_WORKSPACE_DIRECTORY}"
-      dockerfile: ".devcontainer/dockerfile"
+      dockerfile: ".devcontainer/docker/devcontainer.dockerfile"
       args:
         - PLATFORM=${PLATFORM}
-        - CONTAINER_REPOSITORY_MOUNT_POINT=${CONTAINER_REPOSITORY_MOUNT_POINT}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
         - CONTAINER_WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
+        - CONTAINER_REPOSITORY_MOUNT_POINT=${CONTAINER_REPOSITORY_MOUNT_POINT}
         - USERNAME=${LOCAL_USERNAME}
         - USER_UID=${LOCAL_USER_UID}
         - USER_GID=${LOCAL_USER_GID}
@@ -30,3 +31,10 @@ services:
     privileged: true
     ipc: host
     runtime: nvidia
+  fast_dds_router:
+    build:
+      context: "${LOCAL_WORKSPACE_DIRECTORY}"
+      dockerfile: ".devcontainer/docker/fast_dds_router.dockerfile"
+      args:
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+    network_mode: host

@@ -1,0 +1,18 @@
+version: v5.0
+
+allowlist:
+  - name: rt/global/*
+  - name: rq/global/*
+  - name: rr/global/*
+
+participants:
+  - name: local
+    kind: local
+    domain: ${ROS_DOMAIN_ID}
+
+  - name: global
+    kind: local
+    domain: 0
+
+specs:
+  discovery-trigger: any
