@@ -14,7 +14,7 @@ blocklist:
 participants:
   - name: local
     kind: simple
-    domain: 4
+    domain: ${ROS_DOMAIN_ID}
 
   - name: global
     kind: simple
