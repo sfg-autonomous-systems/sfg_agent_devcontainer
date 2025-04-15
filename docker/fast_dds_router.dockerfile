@@ -1,3 +1,4 @@
+# check=skip=UndefinedVar
 FROM ubuntu:22.04
 
 # Use bash as shell.

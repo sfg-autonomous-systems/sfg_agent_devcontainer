@@ -33,6 +33,7 @@
                     }
                 },
                 "docker.languageserver.formatter.ignoreMultilineInstructions": true,
+                "docker.lsp.experimental.vulnerabilityScanning": false,
                 "shellformat.effectLanguages": [
                     "shellscript",
                     "dotenv",
