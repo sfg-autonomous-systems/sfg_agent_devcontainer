@@ -34,6 +34,7 @@
                 },
                 "docker.languageserver.formatter.ignoreMultilineInstructions": true,
                 "docker.lsp.experimental.vulnerabilityScanning": false,
+                "docker.extension.dockerEngineAvailabilityPrompt": false,
                 "shellformat.effectLanguages": [
                     "shellscript",
                     "dotenv",
@@ -67,7 +68,7 @@
                 "[cmake]": {
                     "editor.defaultFormatter": "josetr.cmake-language-support-vscode"
                 },
-                "cmake.configureOnOpen": false
+                "cmake.languageSupport.dotnetPath": "/usr/bin/dotnet"
             },
             "extensions": [
                 // General extensions.

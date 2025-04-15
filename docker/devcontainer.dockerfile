@@ -30,17 +30,8 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         iperf3 \
         bmon \
         usbutils \
+        dotnet-sdk-6.0 \
         python3-colcon-mixin && \
-    apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
-
-# Install .NET runtime which is required by the VS Code extension "CMake Language Support".
-RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    sudo dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    \
-    apt update && apt install -y --no-install-recommends \
-        dotnet-runtime-8.0 && \
     apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
 
 #########################################################################################################
@@ -97,8 +88,9 @@ RUN sudo chmod a+rwx "." && \
 #########################################################################################################
 # Setup ROS2.                                                                                           #
 #########################################################################################################
+COPY ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
+
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
-    ln -s "${CONTAINER_REPOSITORY_MOUNT_POINT}/.devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     mkdir -p "${HOME}/.colcon" && \
