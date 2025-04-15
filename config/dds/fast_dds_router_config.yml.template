@@ -4,15 +4,40 @@ allowlist:
   - name: rt/global/*
   - name: rq/global/*
   - name: rr/global/*
+  - name: rt/diagnostics
+  - name: rt/diagnostics_agg
+  - name: rt/diagnostics_toplevel_state
+
+blocklist:
+  - name: rt/global/**/nitros
 
 participants:
   - name: local
-    kind: local
-    domain: ${ROS_DOMAIN_ID}
+    kind: simple
+    domain: 4
 
   - name: global
-    kind: local
+    kind: simple
     domain: 0
+
+topic-routes:
+  - name: rt/diagnostics
+    type: diagnostic_msgs::msg::dds_::DiagnosticArray_
+    routes:
+      - src: local
+        dst: [global]
+
+  - name: rt/diagnostics_agg
+    type: diagnostic_msgs::msg::dds_::DiagnosticArray_
+    routes:
+      - src: local
+        dst: [global]
+
+  - name: rt/diagnostics_toplevel_state
+    type: diagnostic_msgs::msg::dds_::DiagnosticStatus_
+    routes:
+      - src: local
+        dst: [global]
 
 specs:
   discovery-trigger: any

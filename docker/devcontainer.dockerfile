@@ -25,11 +25,22 @@ USER root
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    apt update && apt install -y --no-install-recommends --allow-downgrades \
+    apt update && apt install -y --no-install-recommends \
         iproute2 \
         iperf3 \
+        bmon \
         usbutils \
         python3-colcon-mixin && \
+    apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
+
+# Install .NET runtime which is required by the VS Code extension "CMake Language Support".
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
+    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    sudo dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    \
+    apt update && apt install -y --no-install-recommends \
+        dotnet-runtime-8.0 && \
     apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
 
 #########################################################################################################
