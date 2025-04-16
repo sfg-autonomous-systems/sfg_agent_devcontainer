@@ -118,6 +118,6 @@ RUN mkdir "build/ddsrouter_tool" && \
 #########################################################################################################
 # Run DDS Router.                                                                                       #
 #########################################################################################################
-COPY ".devcontainer/config/dds/fast_dds_router_config.yml.template" "${DDS_ROUTER_DIRECTORY}/fast_dds_router_config.yml.template"
-RUN envsubst < "fast_dds_router_config.yml.template" > "fast_dds_router_config.yml"
-CMD [ "ddsrouter", "-c", "fast_dds_router_config.yml" ]
+COPY ".devcontainer/config/dds/fast_dds_router_config.yaml.template" "${DDS_ROUTER_DIRECTORY}/fast_dds_router_config.yaml.template"
+RUN envsubst < "fast_dds_router_config.yaml.template" > "fast_dds_router_config.yaml"
+CMD [ "ddsrouter", "-c", "fast_dds_router_config.yaml" ]

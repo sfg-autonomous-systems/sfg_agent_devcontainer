@@ -1,6 +1,6 @@
 {
     "name": "Isaac ROS",
-    "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer-user/compose.yml",
+    "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer-user/compose.yaml",
     "service": "devcontainer",
     "overrideCommand": true,
     "workspaceFolder": "/workspaces",
