@@ -40,4 +40,5 @@ topic-routes:
         dst: [global]
 
 specs:
-  discovery-trigger: any
+  discovery-trigger: reader
+  remove-unused-entities: true
