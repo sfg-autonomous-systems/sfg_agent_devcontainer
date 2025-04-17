@@ -88,7 +88,7 @@ RUN sudo chmod a+rwx "." && \
 #########################################################################################################
 # Setup ROS2.                                                                                           #
 #########################################################################################################
-COPY ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
+COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
