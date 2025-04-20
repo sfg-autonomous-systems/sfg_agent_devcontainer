@@ -49,11 +49,6 @@
                 ],
                 // Python settings.
                 "python.languageServer": "Pylance",
-                "python.analysis.extraPaths": [
-                    "/opt/ros/${containerEnv:ROS_DISTRO}/lib/python3.10/site-packages",
-                    "/opt/ros/${containerEnv:ROS_DISTRO}/local/lib/python3.10/dist-packages",
-                    "${containerEnv:REPOSITORY_DIRECTORY}/colcon_ws/build/go2"
-                ],
                 "debugpy.debugJustMyCode": false,
                 "[python]": {
                     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -78,6 +73,7 @@
                 "foxundermoon.shell-format",
                 "redhat.vscode-xml",
                 "redhat.vscode-yaml",
+                "ms-iot.vscode-ros",
                 // Python extensions.
                 "njpwerner.autodocstring",
                 "ms-python.python",
