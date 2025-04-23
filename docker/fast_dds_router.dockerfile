@@ -25,7 +25,7 @@ RUN --mount=type=cache,id=apt_cache_fast_dds_router,target="/var/cache/apt" \
         libtinyxml2-dev \
         libssl-dev \
         libyaml-cpp-dev && \
-    apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/*"
 
 RUN pip install \
         vcstool

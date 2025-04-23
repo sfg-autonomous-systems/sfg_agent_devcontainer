@@ -32,7 +32,7 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         usbutils \
         dotnet-sdk-6.0 \
         python3-colcon-mixin && \
-    apt -y autoremove && apt clean autoclean && rm -rf "/var/lib/apt/lists/*"
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/*"
 
 #########################################################################################################
 # Apply patches.                                                                                        #
@@ -108,5 +108,5 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     if [ -f "/tmp/.devcontainer-user/user_install_dependencies" ]; then \
         sudo chmod +x "/tmp/.devcontainer-user/user_install_dependencies" && \
         "/tmp/.devcontainer-user/user_install_dependencies" \
-        sudo apt -y autoremove && sudo apt clean autoclean && sudo rm -rf "/var/lib/apt/lists/*"; \
+        sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/*" && sudo rm -rf "${HOME}/.ros/rosdep/*"; \
     fi
