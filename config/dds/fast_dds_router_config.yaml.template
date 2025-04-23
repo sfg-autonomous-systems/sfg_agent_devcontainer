@@ -9,7 +9,7 @@ allowlist:
   - name: rt/diagnostics_toplevel_state
 
 blocklist:
-  - name: rt/global/**/nitros
+  - name: rt/**/nitros
 
 participants:
   - name: local
@@ -21,6 +21,36 @@ participants:
     domain: 0
 
 topic-routes:
+  - name: rt/global/*
+    type: "*"
+    qos:
+      reliability: RELIABLE
+    routes:
+      - src: local
+        dst: [global]
+      - src: global
+        dst: [local]
+
+  - name: rq/global/*
+    type: "*"
+    qos:
+    reliability: RELIABLE
+    routes:
+      - src: local
+        dst: [global]
+      - src: global
+        dst: [local]
+
+  - name: rr/global/*
+    type: "*"
+    qos:
+    reliability: RELIABLE
+    routes:
+      - src: local
+        dst: [global]
+      - src: global
+        dst: [local]
+
   - name: rt/diagnostics
     type: diagnostic_msgs::msg::dds_::DiagnosticArray_
     routes:
