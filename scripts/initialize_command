@@ -144,7 +144,7 @@ forward_jtop_gid() {
     set_environment_variable "${ENVIRONMENT_FILE}" "LOCAL_JTOP_GID" "$(stat -c %g /run/jtop.sock)"
   fi
 
-  print_info "< Done jtop GID."
+  print_info "< Done forwarding jtop GID."
 }
 
 execute_user_initialize_command() {
