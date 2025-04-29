@@ -1,6 +1,9 @@
 ARG PLATFORM=arm64
 
 FROM --platform=arm64 nvcr.io/nvidia/isaac/ros:aarch64-ros2_humble_fd3cefe09df8d19bf6cc82b0d57de78d AS base-arm64
+COPY ".devcontainer/build_dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
+COPY ".devcontainer/build_dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
+
 FROM --platform=amd64 nvcr.io/nvidia/isaac/ros:x86_64-ros2_humble_79152baed139e9f4258734f3056c263a AS base-amd64
 FROM base-${PLATFORM}
 
@@ -30,9 +33,10 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         iperf3 \
         bmon \
         usbutils \
-        dotnet-sdk-6.0 \
-        python3-colcon-mixin && \
+        dotnet-sdk-6.0 && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/*"
+
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 #########################################################################################################
 # Apply patches.                                                                                        #
@@ -83,21 +87,70 @@ USER "${USERNAME}"
 # Ensure we can read/write to the working directory.
 RUN sudo chmod a+rwx "." && \
     # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
-    [[ ${PLATFORM} == amd64 ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
+    [[ ${PLATFORM} == "amd64" ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
 #########################################################################################################
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
+RUN if [[ ${PLATFORM} == "arm64" ]]; then \
+        mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
+        # Install ffmpeg.
+        git clone "https://github.com/berndpfrommer/jetson-ffmpeg.git" && cd "jetson-ffmpeg" && \
+        mkdir "build" && cd "build" && \
+        cmake -DCMAKE_INSTALL_PREFIX:PATH="/usr/local" ".." && make -j$(nproc) && sudo make install && sudo ldconfig && \
+        cd "../.." && \
+        git clone -b release/7.1 --depth=1 "git://source.ffmpeg.org/ffmpeg.git" && cd "jetson-ffmpeg" && \
+        "./ffpatch.sh" "../ffmpeg" && \
+        cd "../ffmpeg" && \
+        "./configure" --enable-nvmpi --enable-shared --disable-static --prefix="/usr/local" && \
+        make -j$(nproc) && \
+        sudo make install && \
+        sudo ldconfig && \
+        sudo rm -rf "${HOME}/dependencies" && \
+        # Install ffmpeg_image_transport.
+        mkdir -p "${HOME}/dependencies/ros_ws/src" && cd "${HOME}/dependencies/ros_ws/src" && \
+        git clone --depth=1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
+        cd ".." && \
+        vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
+        source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
+        rosdep update && sudo rosdep install -y --from-paths "." --ignore-src --rosdistro="${ROS_DISTRO}" && sudo rm -rf "${HOME}/.ros/rosdep/*" && \
+        cd "src" && \
+        \
+        for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
+            cd "${package}" && \
+            # Generate debian files.
+            bloom-generate rosdebian && \
+            # Use all cores for building.
+            sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
+            # Ignore missing info for shlibdeps.
+            sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' "debian/rules" && \
+            # Build the package.
+            fakeroot "debian/rules" binary && \
+            # Install the package.
+            cd ".." && sudo apt-get install -y ./*.deb && rm ./*.deb; \
+        done && \
+        \
+        rm -rf "${HOME}/dependencies"; \
+    else \
+        apt update && apt install -y --no-install-recommends && \
+        ros-${ROS_DISTRO}-ffmpeg-image-transport && \
+        apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/*"; \
+    fi
+
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
+    sudo apt update && sudo apt install -y --no-install-recommends \
+        python3-colcon-mixin && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/*" && \
+    \
+    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     mkdir -p "${HOME}/.colcon" && \
     echo "build: {mixin: [compile-commands]}" >>"${HOME}/.colcon/defaults.yaml" && \
     echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >>"/home/${USERNAME}/.bashrc"
 
-ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 #########################################################################################################
 # Install user dependencies.                                                                            #

@@ -4,23 +4,26 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
 source "${SCRIPT_DIR}/print_utils"
 
 create_devcontainer_user_directory() {
-    print_info "> Creating devcontainer user directory."
-    DEVCONTAINER_USER_DIRECTORY=$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")
-    PROJECT_NAME=$(basename $(dirname "${DEVCONTAINER_USER_DIRECTORY}"))
+    START_TEXT="> Creating devcontainer user directory."
+    END_TEXT="< Done creating devcontainer user directory."
 
-    if [[ -d "${DEVCONTAINER_USER_DIRECTORY}" ]]; then
+    print_info "${START_TEXT}"
+    local devcontainer_user_directory=$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")
+    local project_name=$(basename $(dirname "${devcontainer_user_directory}"))
+
+    if [[ -d "${devcontainer_user_directory}" ]]; then
         print_error "Error: Devcontainer user directory already exists."
         exit 1
     fi
 
-    mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
-    echo ".env" >>"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >${DEVCONTAINER_USER_DIRECTORY}/compose.yaml
-    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
-    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_install_dependencies"
-    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
-    chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
-    print_info "< Done creating devcontainer user directory."
+    mkdir -p "${devcontainer_user_directory}"
+    echo ".env" >>"${devcontainer_user_directory}/.gitignore"
+    project_name=${project_name} envsubst '${project_name}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >${devcontainer_user_directory}/compose.yaml
+    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_initialize_command"
+    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_install_dependencies"
+    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_post_start_command"
+    chmod +x "${devcontainer_user_directory}/user_"*
+    print_info "${END_TEXT}"
 }
 
 create_devcontainer_user_directory
