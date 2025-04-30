@@ -155,6 +155,7 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
     git clone -b "humble-backport" --depth 1 "https://github.com/Tuntenfisch/image_transport_plugins_humble_backport.git" && \
     cd ".." && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
+    rosdep update && sudo rm -rf "${HOME}/.ros/rosdep/*" && \
     cd "src/image_transport_plugins_humble_backport" && \
     \
     for package in "compressed_depth_image_transport"; do \
@@ -176,7 +177,6 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         python3-colcon-mixin && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/*" && \
     \
-    echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >>"${HOME}/.bashrc" && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     mkdir -p "${HOME}/.colcon" && \
