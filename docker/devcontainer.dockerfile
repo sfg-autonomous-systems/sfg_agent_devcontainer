@@ -134,9 +134,18 @@ RUN if [[ ${PLATFORM} == "arm64" ]]; then \
         \
         rm -rf "${HOME}/dependencies"; \
     else \
-        apt update && apt install -y --no-install-recommends && \
-        ros-${ROS_DISTRO}-ffmpeg-image-transport && \
-        apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/*"; \
+        sudo apt update && sudo apt install -y --no-install-recommends \
+            ros-${ROS_DISTRO}-ffmpeg-image-transport && \
+        sudo apt-get install --reinstall \
+            ffmpeg \
+            libavcodec58 \
+            libavformat58 \
+            libavutil56 \
+            libswscale5 \
+            libswresample3 \
+            libavfilter7 \
+            libpostproc55 && \
+        sudo apt -y autoremove && sudo apt clean && rm -rf "/var/lib/apt/lists/*"; \
     fi
 
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
