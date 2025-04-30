@@ -94,6 +94,7 @@ RUN sudo chmod a+rwx "." && \
 #########################################################################################################
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
+# Install ffmpeg_image_transport.
 RUN if [[ ${PLATFORM} == "arm64" ]]; then \
         mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         # Install ffmpeg.
@@ -129,14 +130,14 @@ RUN if [[ ${PLATFORM} == "arm64" ]]; then \
             # Build the package.
             fakeroot "debian/rules" binary && \
             # Install the package.
-            cd ".." && sudo apt-get install -y ./*.deb && rm ./*.deb; \
+            cd ".." && sudo apt install -y ./*.deb && rm ./*.deb; \
         done && \
         \
         rm -rf "${HOME}/dependencies"; \
     else \
         sudo apt update && sudo apt install -y --no-install-recommends \
             ros-${ROS_DISTRO}-ffmpeg-image-transport && \
-        sudo apt-get install --reinstall \
+        sudo apt install --reinstall \
             ffmpeg \
             libavcodec58 \
             libavformat58 \
@@ -147,6 +148,28 @@ RUN if [[ ${PLATFORM} == "arm64" ]]; then \
             libpostproc55 && \
         sudo apt -y autoremove && sudo apt clean && rm -rf "/var/lib/apt/lists/*"; \
     fi
+
+# Install a backport of jazzy's compressed_depth_image_transport to make RVL compression available.
+RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
+    mkdir -p "${HOME}/dependencies/ros_ws/src" && cd "${HOME}/dependencies/ros_ws/src" && \
+    git clone -b "humble-backport" --depth 1 "https://github.com/Tuntenfisch/image_transport_plugins_humble_backport.git" && \
+    cd ".." && \
+    source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
+    cd "src/image_transport_plugins_humble_backport" && \
+    \
+    for package in "compressed_depth_image_transport"; do \
+        cd "${package}" && \
+        # Generate debian files.
+        bloom-generate rosdebian && \
+        # Use all cores for building.
+        sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
+        # Build the package.
+        fakeroot "debian/rules" binary && \
+        # Install the package.
+        cd ".." && sudo apt install -y ./*.deb && rm ./*.deb; \
+    done && \
+    \
+    rm -rf "${HOME}/dependencies"
 
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
