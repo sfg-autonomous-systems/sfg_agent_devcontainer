@@ -18,16 +18,6 @@ participants:
     domain: 0
 
 topic-routes:
-  - name: rt/global/*
-    type: "*"
-    qos:
-      reliability: RELIABLE
-    routes:
-      - src: local
-        dst: [global]
-      - src: global
-        dst: [local]
-
   - name: rq/global/*
     type: "*"
     qos:
