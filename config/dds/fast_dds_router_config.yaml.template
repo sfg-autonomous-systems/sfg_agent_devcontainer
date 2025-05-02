@@ -4,9 +4,6 @@ allowlist:
   - name: rt/global/*
   - name: rq/global/*
   - name: rr/global/*
-  - name: rt/diagnostics
-  - name: rt/diagnostics_agg
-  - name: rt/diagnostics_toplevel_state
 
 blocklist:
   - name: rt/**/nitros
@@ -19,55 +16,6 @@ participants:
   - name: global
     kind: simple
     domain: 0
-
-topic-routes:
-  - name: rt/global/*
-    type: "*"
-    qos:
-      reliability: RELIABLE
-    routes:
-      - src: local
-        dst: [global]
-      - src: global
-        dst: [local]
-
-  - name: rq/global/*
-    type: "*"
-    qos:
-    reliability: RELIABLE
-    routes:
-      - src: local
-        dst: [global]
-      - src: global
-        dst: [local]
-
-  - name: rr/global/*
-    type: "*"
-    qos:
-    reliability: RELIABLE
-    routes:
-      - src: local
-        dst: [global]
-      - src: global
-        dst: [local]
-
-  - name: rt/diagnostics
-    type: diagnostic_msgs::msg::dds_::DiagnosticArray_
-    routes:
-      - src: local
-        dst: [global]
-
-  - name: rt/diagnostics_agg
-    type: diagnostic_msgs::msg::dds_::DiagnosticArray_
-    routes:
-      - src: local
-        dst: [global]
-
-  - name: rt/diagnostics_toplevel_state
-    type: diagnostic_msgs::msg::dds_::DiagnosticStatus_
-    routes:
-      - src: local
-        dst: [global]
 
 specs:
   discovery-trigger: reader
