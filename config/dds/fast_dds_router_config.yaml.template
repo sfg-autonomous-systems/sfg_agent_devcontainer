@@ -17,11 +17,14 @@ participants:
     kind: simple
     domain: 0
 
+# ToDo: We explicitly force all service traffic (topics starting with "rq" or "rr" to have reliability "RELIABLE").
+# Ideally the actual service's QoS should dictate the QoS used by the router. But I'm not sure if this option exists
+# within the router configuration. Needs to be investigated.
 topic-routes:
   - name: rq/global/*
     type: "*"
     qos:
-    reliability: RELIABLE
+      reliability: RELIABLE
     routes:
       - src: local
         dst: [global]
@@ -31,13 +34,19 @@ topic-routes:
   - name: rr/global/*
     type: "*"
     qos:
-    reliability: RELIABLE
+      reliability: RELIABLE
     routes:
       - src: local
         dst: [global]
       - src: global
         dst: [local]
 
+# ToDo: Ideally we want to have 
+#     - discovery-trigger: any
+#     - remove-unused-entities: true
+# but this combination is not supported by the router as of now.
+# I've created a GitHub issue about this (and other issues):
+#     - https://github.com/eProsima/DDS-Router/issues/498
 specs:
   discovery-trigger: reader
   remove-unused-entities: true
