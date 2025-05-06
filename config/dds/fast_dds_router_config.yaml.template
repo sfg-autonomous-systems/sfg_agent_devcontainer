@@ -17,24 +17,11 @@ participants:
     kind: simple
     domain: 0
 
-# ToDo: The heartbeat topic is the only topic forwarded with RELIABLE reliability. Ideally topics should be forwarded with the
-# reliability setting requested by the subscriber if possible. But this does not seem configurable within Fast DDS router.
-#
-# Also, we explicitly force all service traffic (names starting with "rq" or "rr" to have RELIABLE reliability).
+# ToDo: we explicitly force all service traffic (names starting with "rq" or "rr" to have RELIABLE reliability).
 # Ideally the actual service's QoS should dictate the QoS used by the router.
 #
 # Update: Issue has been opened (https://github.com/eProsima/DDS-Router/issues/503).
 topic-routes:
-  - name: "rt/global/agent_heartbeat"
-    type: "sfg_agent_msgs::msg::dds_::AgentHeartbeat_"
-    qos:
-      reliability: RELIABLE
-    routes:
-      - src: local
-        dst: [global]
-      - src: global
-        dst: [local]
-
   - name: rq/global/*
     type: "*"
     qos:
