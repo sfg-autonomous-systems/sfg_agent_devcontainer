@@ -1,5 +1,5 @@
 # check=skip=UndefinedVar
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS fast_dds_router
 
 # Use bash as shell.
 SHELL ["/bin/bash", "-c"]
@@ -118,6 +118,6 @@ RUN mkdir "build/ddsrouter_tool" && \
 #########################################################################################################
 # Run DDS Router.                                                                                       #
 #########################################################################################################
-COPY ".devcontainer/config/dds/fast_dds_router_config.yaml.template" "${DDS_ROUTER_DIRECTORY}/fast_dds_router_config.yaml.template"
+COPY ".devcontainer/config/fast_dds_router_config.yaml.template" "${DDS_ROUTER_DIRECTORY}/fast_dds_router_config.yaml.template"
 RUN envsubst < "fast_dds_router_config.yaml.template" > "fast_dds_router_config.yaml"
 CMD [ "ddsrouter", "-c", "fast_dds_router_config.yaml" ]

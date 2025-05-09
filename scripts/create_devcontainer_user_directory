@@ -16,12 +16,12 @@ create_devcontainer_user_directory() {
         exit 1
     fi
 
-    mkdir -p "${devcontainer_user_directory}"
+    mkdir -p "${devcontainer_user_directory}/docker"
+    mkdir -p "${devcontainer_user_directory}/scripts"
     echo ".env" >>"${devcontainer_user_directory}/.gitignore"
     project_name=${project_name} envsubst '${project_name}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >${devcontainer_user_directory}/compose.yaml
-    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_initialize_command"
-    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_install_dependencies"
-    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/user_post_start_command"
+    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/scripts/user_initialize_command"
+    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/scripts/user_post_start_command"
     chmod +x "${devcontainer_user_directory}/user_"*
     print_info "${END_TEXT}"
 }

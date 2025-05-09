@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
 source "${SCRIPT_DIR}/print_utils"
 
 execute_user_post_start_command() {
-    local USER_POST_START_COMMAND="${REPOSITORY_DIRECTORY}/.devcontainer-user/user_post_start_command"
+    local USER_POST_START_COMMAND="${REPOSITORY_DIRECTORY}/.devcontainer-user/scripts/user_post_start_command"
     local START_TEXT="> Executing user post start command '${USER_POST_START_COMMAND}'."
     local END_TEXT="< Done executing user post start command '${USER_POST_START_COMMAND}'."
 
