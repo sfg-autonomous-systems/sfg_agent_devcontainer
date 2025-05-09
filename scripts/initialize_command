@@ -242,9 +242,9 @@ instantiate_dockerfile_template() {
     local DOCKERFILE="${SCRIPT_DIR}/../docker/devcontainer.dockerfile"
 
     if [ -f "${DOCKERFILE_USER}" ]; then
-        sed -e "/:DOCKERFILE_USER:/{r ${DOCKERFILE_USER}" -e "d}" "${DOCKERFILE_TEMPLATE}" > "${DOCKERFILE}"
+        sed -e "/:DOCKERFILE_USER:/{r ${DOCKERFILE_USER}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     else
-        sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" > "${DOCKERFILE}"
+        sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     fi
 
     print_info "${END_TEXT}"

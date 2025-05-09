@@ -8,21 +8,21 @@ create_devcontainer_user_directory() {
     END_TEXT="< Done creating devcontainer user directory."
 
     print_info "${START_TEXT}"
-    local devcontainer_user_directory=$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")
-    local project_name=$(basename $(dirname "${devcontainer_user_directory}"))
+    local DEVCONTAINER_USER_DIRECTORY=$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")
+    local PROJECT_NAME=$(basename $(dirname "${DEVCONTAINER_USER_DIRECTORY}"))
 
-    if [[ -d "${devcontainer_user_directory}" ]]; then
+    if [[ -d "${DEVCONTAINER_USER_DIRECTORY}" ]]; then
         print_error "Error: Devcontainer user directory already exists."
         exit 1
     fi
 
-    mkdir -p "${devcontainer_user_directory}/docker"
-    mkdir -p "${devcontainer_user_directory}/scripts"
-    echo ".env" >>"${devcontainer_user_directory}/.gitignore"
-    project_name=${project_name} envsubst '${project_name}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >${devcontainer_user_directory}/compose.yaml
-    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/scripts/user_initialize_command"
-    echo "#!/usr/bin/env bash" >"${devcontainer_user_directory}/scripts/user_post_start_command"
-    chmod +x "${devcontainer_user_directory}/user_"*
+    mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
+    echo ".env" >>"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
+    envsubst <"${SCRIPT_DIR}/../config/dockerfile.template" >${DEVCONTAINER_USER_DIRECTORY}/dockerfile
+    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
+    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
+    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
+    chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
     print_info "${END_TEXT}"
 }
 

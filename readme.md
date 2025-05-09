@@ -11,20 +11,17 @@ In order to integrate this dev container into your project follow the steps belo
 
 2. Execute `.devcontainer/scripts/create_devcontainer_user_directory` to create the integration files required at the root of your project.
 
-3. Additional configuration such as executing code before the image is build, installing custom dependencies inside the container's image, or executing code when the container is started can be achieved with `user_initialize_command`, `user_install_dependencies`, and `user_post_start_command`, respectively. For reference the full directory structure is shown below.
+3. Additional configuration such as executing code before the image is build, installing custom dependencies as part of the container's image, or executing code when the container is started can be achieved with `user_initialize_command`, `dockerfile`, and `user_post_start_command`, respectively. For reference the integrated directory structure is shown below.
     ```
     .
     ├── .devcontainer                       # This repository as a git submodule.
     ├── .devcontainer-user/                 # User configuration to customize the ISAAC ROS dev container.
     │   ├── .gitingnore                     # Contents should be ".env".
     │   ├── compose.yaml
+    │   ├── dockerfile
     │   ├── user_initialize_command
-    │   ├── user_install_dependencies
     │   └── user_post_start_command
     ├── colcon_ws/
-    │   ├── build/
-    │   ├── install/
-    │   ├── log/
     │   └── src/
     └── ...
     ```
@@ -35,4 +32,4 @@ Note that...
 
 2. your project's directory structure should match the directory structure to the extend shown above. This also applies to the filenames shown. For a reference implementation you may refer to [Smart Factory Grids > Autonomous Systems > Robots > Go2](https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/robots/go2).
 
-3. while `user_initialize_command` is executed on the host, `user_install_dependencies` and `user_post_start_command` are executed inside the container. Therefore, you cannot reference anythin that resides outside the directory `.devcontainer-user` in the latter two commands.
+3. while `user_initialize_command` is executed on the host, `user_post_start_command` is executed inside the container. Therefore, you cannot reference anything that resides outside the directory `.devcontainer-user` in the latter command.
