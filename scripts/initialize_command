@@ -273,7 +273,6 @@ disable_host_ntp() {
         fi
 
         print_warning "Disabling and stopping NTP service '${service}'."
-        print_warning "If you want to re-enable it, you can do so by running 'sudo systemctl enable --now ${service}'."
         sudo systemctl disable --now "${service}" >/dev/null 2>&1
         print_warning "If you want to re-enable it, you can do so by running 'sudo systemctl enable --now ${service}'."
     done
