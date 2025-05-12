@@ -219,37 +219,6 @@ copy_build_dependencies() {
     print_info "${END_TEXT}"
 }
 
-execute_user_initialize_command() {
-    local USER_INITIALIZE_COMMAND="${local_workspace_directory}/.devcontainer-user/scripts/user_initialize_command"
-    local START_TEXT="> Executing user initialize command '${USER_INITIALIZE_COMMAND}'."
-    local END_TEXT="< Done executing user initialize command '${USER_INITIALIZE_COMMAND}'."
-
-    if [ -f "${USER_INITIALIZE_COMMAND}" ]; then
-        print_info "${START_TEXT}"
-        "${USER_INITIALIZE_COMMAND}" "${@}"
-        print_info "${END_TEXT}"
-    fi
-}
-
-instantiate_dockerfile_template() {
-    local START_TEXT="> Instantiating dockerfile template."
-    local END_TEXT="< Done instantiating dockerfile template."
-
-    print_info "${START_TEXT}"
-
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../config/devcontainer.dockerfile.template"
-    local DOCKERFILE_USER="${local_workspace_directory}/.devcontainer-user/dockerfile"
-    local DOCKERFILE="${SCRIPT_DIR}/../docker/devcontainer.dockerfile"
-
-    if [ -f "${DOCKERFILE_USER}" ]; then
-        sed -e "/:DOCKERFILE_USER:/{r ${DOCKERFILE_USER}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
-    else
-        sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
-    fi
-
-    print_info "${END_TEXT}"
-}
-
 disable_host_ntp() {
     local START_TEXT="> Disabling host NTP."
     local END_TEXT="< Done disabling host NTP."
@@ -276,6 +245,37 @@ disable_host_ntp() {
         sudo systemctl disable --now "${service}" >/dev/null 2>&1
         print_warning "If you want to re-enable it, you can do so by running 'sudo systemctl enable --now ${service}'."
     done
+
+    print_info "${END_TEXT}"
+}
+
+execute_user_initialize_command() {
+    local USER_INITIALIZE_COMMAND="${local_workspace_directory}/.devcontainer-user/user_initialize_command"
+    local START_TEXT="> Executing user initialize command '${USER_INITIALIZE_COMMAND}'."
+    local END_TEXT="< Done executing user initialize command '${USER_INITIALIZE_COMMAND}'."
+
+    if [ -f "${USER_INITIALIZE_COMMAND}" ]; then
+        print_info "${START_TEXT}"
+        "${USER_INITIALIZE_COMMAND}" "${@}"
+        print_info "${END_TEXT}"
+    fi
+}
+
+instantiate_dockerfile_template() {
+    local START_TEXT="> Instantiating dockerfile template."
+    local END_TEXT="< Done instantiating dockerfile template."
+
+    print_info "${START_TEXT}"
+
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../config/devcontainer.dockerfile.template"
+    local DOCKERFILE_USER="${local_workspace_directory}/.devcontainer-user/dockerfile"
+    local DOCKERFILE="${SCRIPT_DIR}/../docker/devcontainer.dockerfile"
+
+    if [ -f "${DOCKERFILE_USER}" ]; then
+        sed -e "/:DOCKERFILE_USER:/{r ${DOCKERFILE_USER}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
+    else
+        sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
+    fi
 
     print_info "${END_TEXT}"
 }
