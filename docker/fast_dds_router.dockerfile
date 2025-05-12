@@ -1,4 +1,3 @@
-# check=skip=UndefinedVar
 FROM ubuntu:22.04 AS fast_dds_router
 
 # Use bash as shell.
