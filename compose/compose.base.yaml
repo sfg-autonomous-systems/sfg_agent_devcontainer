@@ -11,6 +11,7 @@ services:
         - USERNAME=${LOCAL_USERNAME}
         - USER_UID=${LOCAL_USER_UID}
         - USER_GID=${LOCAL_USER_GID}
+    restart: unless-stopped
     volumes:
       - type: bind
         source: "${LOCAL_WORKSPACE_DIRECTORY}"
@@ -22,6 +23,10 @@ services:
         source: "/dev"
         target: "/dev"
       - type: bind
+        source: "/etc/timezone"
+        target: "/etc/timezone"
+        read_only: true
+      - type: bind
         source: "/etc/localtime"
         target: "/etc/localtime"
         read_only: true
@@ -31,10 +36,45 @@ services:
     privileged: true
     ipc: host
     runtime: nvidia
+    depends_on:
+      - ntp
+
   fast_dds_router:
     build:
       context: "${LOCAL_WORKSPACE_DIRECTORY}"
       dockerfile: ".devcontainer/docker/fast_dds_router.dockerfile"
       args:
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: "/etc/timezone"
+        target: "/etc/timezone"
+        read_only: true
+      - type: bind
+        source: "/etc/localtime"
+        target: "/etc/localtime"
+        read_only: true
     network_mode: host
+    privileged: true
+    depends_on:
+      - ntp
+
+  ntp:
+    image: dockurr/chrony
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: "/etc/timezone"
+        target: "/etc/timezone"
+        read_only: true
+      - type: bind
+        source: "/etc/localtime"
+        target: "/etc/localtime"
+        read_only: true
+    environment:
+      - "NTP_SERVERS=192.168.50.3,pool.ntp.org"
+      - "ENABLE_SYSCLK=true"
+      - "LOG_LEVEL=0"
+    network_mode: host
+    privileged: true

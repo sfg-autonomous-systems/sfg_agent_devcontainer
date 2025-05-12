@@ -250,6 +250,37 @@ instantiate_dockerfile_template() {
     print_info "${END_TEXT}"
 }
 
+disable_host_ntp() {
+    local START_TEXT="> Disabling host NTP."
+    local END_TEXT="< Done disabling host NTP."
+
+    print_info "${START_TEXT}"
+    print_warning "Time synchronization is handled by the container."
+
+    NTP_SERVICES=("chronyd" "systemd-timesyncd" "ntpd" "ntp")
+
+    for service in "${NTP_SERVICES[@]}"; do
+        if ! systemctl list-unit-files | grep -q "^${service}.service" >/dev/null 2>&1; then
+            continue
+        fi
+
+        if ! systemctl is-active --quiet "${service}" >/dev/null 2>&1; then
+            continue
+        fi
+
+        if ! systemctl is-enabled --quiet "${service}" >/dev/null 2>&1; then
+            continue
+        fi
+
+        print_warning "Disabling and stopping NTP service '${service}'."
+        print_warning "If you want to re-enable it, you can do so by running 'sudo systemctl enable --now ${service}'."
+        sudo systemctl disable --now "${service}" >/dev/null 2>&1
+        print_warning "If you want to re-enable it, you can do so by running 'sudo systemctl enable --now ${service}'."
+    done
+
+    print_info "${END_TEXT}"
+}
+
 print_plain ""
 set_up_mounted_directory
 configure_ros_domain_id
@@ -259,5 +290,6 @@ forward_user
 forward_platform
 forward_jtop_gid
 copy_build_dependencies
+disable_host_ntp
 execute_user_initialize_command "${@}"
 instantiate_dockerfile_template
