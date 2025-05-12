@@ -22,6 +22,14 @@ participants:
 #
 # Update: Issue has been opened (https://github.com/eProsima/DDS-Router/issues/503).
 topic-routes:
+  - name: rt/global/*
+    type: "*"
+    routes:
+      - src: local
+        dst: [global]
+      - src: global
+        dst: [local]
+
   - name: rq/global/*
     type: "*"
     qos:
