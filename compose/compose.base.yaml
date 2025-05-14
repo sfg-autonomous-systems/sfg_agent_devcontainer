@@ -37,6 +37,7 @@ services:
     ipc: host
     runtime: nvidia
     depends_on:
+      - fast_dds_router
       - ntp
 
   fast_dds_router:
