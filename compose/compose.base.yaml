@@ -38,7 +38,6 @@ services:
     runtime: nvidia
     depends_on:
       - fast_dds_router
-      - ntp
 
   fast_dds_router:
     build:
@@ -56,26 +55,5 @@ services:
         source: "/etc/localtime"
         target: "/etc/localtime"
         read_only: true
-    network_mode: host
-    privileged: true
-    depends_on:
-      - ntp
-
-  ntp:
-    image: dockurr/chrony
-    restart: unless-stopped
-    volumes:
-      - type: bind
-        source: "/etc/timezone"
-        target: "/etc/timezone"
-        read_only: true
-      - type: bind
-        source: "/etc/localtime"
-        target: "/etc/localtime"
-        read_only: true
-    environment:
-      - "NTP_SERVERS=192.168.50.3,pool.ntp.org"
-      - "ENABLE_SYSCLK=true"
-      - "LOG_LEVEL=0"
     network_mode: host
     privileged: true
