@@ -1,10 +1,11 @@
+
 ARG PLATFORM=arm64
 
-FROM --platform=arm64 nvcr.io/nvidia/isaac/ros:aarch64-ros2_humble_fd3cefe09df8d19bf6cc82b0d57de78d AS base-arm64
+FROM --platform=arm64 isaac-ros AS base-arm64
 COPY ".devcontainer/build_dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
 COPY ".devcontainer/build_dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
 
-FROM --platform=amd64 nvcr.io/nvidia/isaac/ros:x86_64-ros2_humble_79152baed139e9f4258734f3056c263a AS base-amd64
+FROM --platform=amd64 isaac-ros AS base-amd64
 FROM base-${PLATFORM} AS devcontainer
 
 # Use bash as shell.

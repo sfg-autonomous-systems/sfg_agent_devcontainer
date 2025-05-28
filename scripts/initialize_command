@@ -150,6 +150,7 @@ forward_platform() {
     local END_TEXT="< Done forwarding platform."
 
     print_info "${START_TEXT}"
+    local platform=""
 
     case $(uname -m) in
     "x86_64")
@@ -231,6 +232,30 @@ execute_user_initialize_command() {
     fi
 }
 
+build_isaac_ros_image() {
+    local START_TEXT="> Building Isaac ROS image."
+    local END_TEXT="< Done building Isaac ROS image."
+
+    print_info "${START_TEXT}"
+    local image_key=""
+
+    case $(uname -m) in
+    "x86_64")
+        image_key="x86_64"
+        ;;
+
+    "aarch64" | "arm64")
+        image_key="aarch64"
+        ;;
+    esac
+
+    "${SCRIPT_DIR}/../build_dependencies/isaac_ros_common/scripts/build_image_layers.sh" \
+        --image_key  "${image_key} ros2_humble" \
+        --image_name "isaac-ros"
+
+    print_info "${END_TEXT}"
+}
+
 instantiate_dockerfile_template() {
     local START_TEXT="> Instantiating dockerfile template."
     local END_TEXT="< Done instantiating dockerfile template."
@@ -260,4 +285,5 @@ forward_platform
 forward_jtop_gid
 copy_build_dependencies
 execute_user_initialize_command "${@}"
+build_isaac_ros_image
 instantiate_dockerfile_template
