@@ -232,9 +232,9 @@ execute_user_initialize_command() {
     fi
 }
 
-build_isaac_ros_image() {
-    local START_TEXT="> Building Isaac ROS image."
-    local END_TEXT="< Done building Isaac ROS image."
+build_isaac_ros_base_image() {
+    local START_TEXT="> Building Isaac ROS base image."
+    local END_TEXT="< Done building Isaac ROS base image."
 
     print_info "${START_TEXT}"
     local image_key=""
@@ -250,21 +250,21 @@ build_isaac_ros_image() {
     esac
 
     "${SCRIPT_DIR}/../build_dependencies/isaac_ros_common/scripts/build_image_layers.sh" \
-        --image_key  "${image_key} ros2_humble" \
-        --image_name "isaac-ros"
+        --image_key "${image_key} ros2_humble" \
+        --image_name "isaac-ros-base"
 
     print_info "${END_TEXT}"
 }
 
-instantiate_dockerfile_template() {
-    local START_TEXT="> Instantiating dockerfile template."
-    local END_TEXT="< Done instantiating dockerfile template."
+instantiate_isaac_ros_dockerfile_template() {
+    local START_TEXT="> Instantiating Isaac ROS dockerfile template."
+    local END_TEXT="< Done instantiating Isaac ROS dockerfile template."
 
     print_info "${START_TEXT}"
 
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../config/devcontainer.dockerfile.template"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../config/isaac_ros.dockerfile.template"
     local DOCKERFILE_USER="${local_workspace_directory}/.devcontainer-user/dockerfile"
-    local DOCKERFILE="${SCRIPT_DIR}/../docker/devcontainer.dockerfile"
+    local DOCKERFILE="${SCRIPT_DIR}/../docker/isaac_ros.dockerfile"
 
     if [ -f "${DOCKERFILE_USER}" ]; then
         sed -e "/:DOCKERFILE_USER:/{r ${DOCKERFILE_USER}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
@@ -285,5 +285,5 @@ forward_platform
 forward_jtop_gid
 copy_build_dependencies
 execute_user_initialize_command "${@}"
-build_isaac_ros_image
-instantiate_dockerfile_template
+build_isaac_ros_base_image
+instantiate_isaac_ros_dockerfile_template

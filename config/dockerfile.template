@@ -1,1 +1,1 @@
-FROM devcontainer AS ${PROJECT_NAME}
+FROM isaac-ros AS ${PROJECT_NAME}

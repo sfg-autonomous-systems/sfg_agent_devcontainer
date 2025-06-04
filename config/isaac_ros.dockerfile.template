@@ -1,12 +1,12 @@
 
 ARG PLATFORM=arm64
 
-FROM --platform=arm64 isaac-ros AS base-arm64
+FROM --platform=arm64 isaac-ros-base AS base-arm64
 COPY ".devcontainer/build_dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
 COPY ".devcontainer/build_dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
 
-FROM --platform=amd64 isaac-ros AS base-amd64
-FROM base-${PLATFORM} AS devcontainer
+FROM --platform=amd64 isaac-ros-base AS base-amd64
+FROM base-${PLATFORM} AS isaac-ros
 
 # Use bash as shell.
 SHELL ["/bin/bash", "-c"]
@@ -195,4 +195,3 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
 #########################################################################################################
-:DOCKERFILE_USER:

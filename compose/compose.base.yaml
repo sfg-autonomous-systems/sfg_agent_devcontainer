@@ -1,8 +1,8 @@
 services:
-  devcontainer:
+  isaac_ros:
     build:
       context: "${LOCAL_WORKSPACE_DIRECTORY}"
-      dockerfile: ".devcontainer/docker/devcontainer.dockerfile"
+      dockerfile: ".devcontainer/docker/isaac_ros.dockerfile"
       args:
         - PLATFORM=${PLATFORM}
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}

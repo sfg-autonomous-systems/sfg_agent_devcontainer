@@ -1,5 +1,5 @@
 services:
-  devcontainer:
+  isaac_ros:
     volumes:
       - type: bind
         source: /usr/bin/tegrastats

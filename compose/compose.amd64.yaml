@@ -1,4 +1,4 @@
 services:
-  devcontainer:
+  isaac_ros:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
