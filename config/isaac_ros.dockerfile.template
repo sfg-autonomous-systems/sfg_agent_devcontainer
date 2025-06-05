@@ -191,7 +191,6 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     echo "build: {mixin: [compile-commands]}" >>"${HOME}/.colcon/defaults.yaml" && \
     echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" >>"/home/${USERNAME}/.bashrc"
 
-
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
 #########################################################################################################
