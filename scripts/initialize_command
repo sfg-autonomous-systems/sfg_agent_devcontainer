@@ -111,13 +111,13 @@ setup_ntp_client() {
     print_info "${START_TEXT}"
 
     if ! systemctl is-enabled systemd-timesyncd.service &>"/dev/null"; then
-        print_error "Error: NTP client setup requires service systemd-timesyncd."
-        return 1
+        print_error "Error: NTP client setup requires service systemd-timesyncd. You need to install and enable it with 'sudo systemctl enable --now systemd-timesyncd'."
+        exit 1
     fi
 
     local CONFIG_FILE="/etc/systemd/timesyncd.conf"
     local NTP_SERVER="192.168.50.1"
-    local FALLBACK_NTP_SERVER="ntp.ubunutu.com"
+    local FALLBACK_NTP_SERVER="ntp.ubuntu.com"
 
     sudo sed -i \
         -e '/^NTP=.*/d' \
