@@ -104,6 +104,32 @@ setup_repository() {
     print_info "${END_TEXT}"
 }
 
+setup_ntp_client() {
+    local START_TEXT="> Setting up NTP client."
+    local END_TEXT="< Done setting up NTP client."
+
+    print_info "${START_TEXT}"
+
+    if ! systemctl is-enabled systemd-timesyncd.service &>"/dev/null"; then
+        print_error "Error: NTP client setup requires service systemd-timesyncd."
+        return 1
+    fi
+
+    local CONFIG_FILE="/etc/systemd/timesyncd.conf"
+    local NTP_SERVER="192.168.50.1"
+    local FALLBACK_NTP_SERVER="ntp.ubunutu.com"
+
+    sudo sed -i \
+        -e '/^NTP=.*/d' \
+        -e '/^FallbackNTP=.*/d' \
+        -e "/^\[Time\]/a NTP=${NTP_SERVER}\nFallbackNTP=${FALLBACK_NTP_SERVER}" \
+        "${CONFIG_FILE}"
+    
+    timedatectl set-ntp true
+    sudo systemctl restart systemd-timesyncd
+    print_info "${END_TEXT}"
+}
+
 forward_environment_variables() {
     local START_TEXT="> Forwarding environment variables."
     local END_TEXT="< Done forwarding environment variables."
@@ -279,6 +305,7 @@ print_plain ""
 set_up_mounted_directory
 configure_ros_domain_id
 setup_repository
+setup_ntp_client
 forward_environment_variables "${@}"
 forward_user
 forward_platform
