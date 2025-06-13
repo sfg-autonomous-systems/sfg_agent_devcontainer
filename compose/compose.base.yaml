@@ -1,7 +1,7 @@
 services:
   isaac_ros:
     build:
-      context: "${LOCAL_WORKSPACE_DIRECTORY}"
+      context: "../.."
       dockerfile: ".devcontainer/docker/isaac_ros.dockerfile"
       args:
         - PLATFORM=${PLATFORM}
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     volumes:
       - type: bind
-        source: "${LOCAL_WORKSPACE_DIRECTORY}"
+        source: "../.."
         target: "${CONTAINER_REPOSITORY_MOUNT_POINT}"
       - type: bind
         source: "${LOCAL_SELECTED_DIRECTORY}"
@@ -41,7 +41,7 @@ services:
 
   fast_dds_router:
     build:
-      context: "${LOCAL_WORKSPACE_DIRECTORY}"
+      context: "../.."
       dockerfile: ".devcontainer/docker/fast_dds_router.dockerfile"
       args:
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}

@@ -6,7 +6,7 @@ source "${SCRIPT_DIR}/print_utils"
 
 local_workspace_directory="${1#*=}"
 container_workspace_directory="${2#*=}"
-ENVIRONMENT_FILE="${local_workspace_directory}/.devcontainer-user/.env"
+ENVIRONMENT_FILE="${SCRIPT_DIR}/../../.devcontainer-user/.env"
 
 set_up_mounted_directory() {
     local START_TEXT="> Setting up a directory to be mounted inside the dev container."
@@ -115,18 +115,36 @@ setup_ntp_client() {
         exit 1
     fi
 
+    local changes_made=false
+
     local CONFIG_FILE="/etc/systemd/timesyncd.conf"
     local NTP_SERVER="192.168.50.1"
     local FALLBACK_NTP_SERVER="ntp.ubuntu.com"
+    local SED_EXPRESSION=(
+        -e '/^NTP=.*/d'
+        -e '/^FallbackNTP=.*/d'
+        -e "/^\[Time\]/a NTP=${NTP_SERVER}\nFallbackNTP=${FALLBACK_NTP_SERVER}"
+    )
 
-    sudo sed -i \
-        -e '/^NTP=.*/d' \
-        -e '/^FallbackNTP=.*/d' \
-        -e "/^\[Time\]/a NTP=${NTP_SERVER}\nFallbackNTP=${FALLBACK_NTP_SERVER}" \
-        "${CONFIG_FILE}"
-    
-    timedatectl set-ntp true
-    sudo systemctl restart systemd-timesyncd
+    if ! sed "${SED_EXPRESSION[@]}" "${CONFIG_FILE}" | diff -q - "${CONFIG_FILE}" >"/dev/null"; then
+        print_plain "NTP server configuration requires changes. Updating..."
+        sudo sed -i "${SED_EXPRESSION[@]}" "${CONFIG_FILE}"
+        changes_made=true
+    fi
+
+    if ! timedatectl | grep -q 'NTP service: active'; then
+        print_plain "NTP service is not active. Enabling..."
+        timedatectl set-ntp true
+        changes_made=true
+    fi
+
+    if [ "${changes_made}" = true ]; then
+        print_info "Configuration changed. Restarting systemd-timesyncd service..."
+        sudo systemctl restart systemd-timesyncd
+    else
+        print_plain "No changes were necessary."
+    fi
+
     print_info "${END_TEXT}"
 }
 
@@ -288,7 +306,7 @@ instantiate_isaac_ros_dockerfile_template() {
 
     print_info "${START_TEXT}"
 
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../config/isaac_ros.dockerfile.template"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/isaac_ros.dockerfile.template"
     local DOCKERFILE_USER="${local_workspace_directory}/.devcontainer-user/dockerfile"
     local DOCKERFILE="${SCRIPT_DIR}/../docker/isaac_ros.dockerfile"
 

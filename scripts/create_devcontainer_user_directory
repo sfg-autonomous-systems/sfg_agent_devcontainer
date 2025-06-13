@@ -18,8 +18,8 @@ create_devcontainer_user_directory() {
 
     mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
     echo ".env" >>"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../config/dockerfile.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../config/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
+    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/dockerfile.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile"
+    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
