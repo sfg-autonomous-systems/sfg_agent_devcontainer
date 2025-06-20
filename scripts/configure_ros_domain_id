@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+configure_ros_domain_id() {
+    local environment_file="${1}"
+
+    local START_TEXT="> Configure ROS domain ID."
+    local END_TEXT="< Done configuring ROS domain ID."
+
+    print_info "${START_TEXT}"
+    local ENVIRONMENT_VARIABLE="ROS_DOMAIN_ID"
+    local value=$(get_environment_variable "${environment_file}" "${ENVIRONMENT_VARIABLE}")
+
+    if [[ -n "${value}" ]]; then
+        local MESSAGE="ROS domain ID '${value}' is already set. Would you like to configure a different domain ID? [y/N] "
+        read -rp "${MESSAGE}" confirm
+
+        if [[ ! "${confirm}" == y ]]; then
+            print_info "${END_TEXT}"
+            return
+        fi
+    fi
+
+    # Ask the user for a domain ID.
+    read -rp "Enter a ROS domain ID in the range [1-101] or [215-232]: " value
+
+    # Validate input.
+    if [[ -z "${value}" ]]; then
+        print_error "Error: ROS domain ID configuration canceled."
+        exit 1
+    fi
+
+    if ! [[ "${value}" =~ ^[0-9]+$ ]]; then
+        print_error "Error: Invalid input. Please enter an integer."
+        exit 1
+    fi
+
+    if ! { [[ "${value}" -ge 1 && "${value}" -le 101 ]] || [[ "${value}" -ge 215 && "${value}" -le 232 ]]; }; then
+        print_error "Error: ROS domain ID must be between 1-101 or 215-232."
+        exit 1
+    fi
+
+    # Save the chosen ROS domain ID.
+    set_environment_variable "${environment_file}" "${ENVIRONMENT_VARIABLE}" "${value}"
+    print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/common"
+    configure_ros_domain_id "${@}"
+fi

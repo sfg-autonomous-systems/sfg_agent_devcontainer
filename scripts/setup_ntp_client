@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+setup_ntp_client() {
+    local START_TEXT="> Setting up NTP client."
+    local END_TEXT="< Done setting up NTP client."
+
+    print_info "${START_TEXT}"
+
+    if ! systemctl is-enabled systemd-timesyncd.service &>"/dev/null"; then
+        print_error "Error: NTP client setup requires service systemd-timesyncd. You need to install and enable it with 'sudo systemctl enable --now systemd-timesyncd'."
+        exit 1
+    fi
+
+    local changes_made=false
+
+    local CONFIG_FILE="/etc/systemd/timesyncd.conf"
+    local NTP_SERVER="192.168.50.1"
+    local FALLBACK_NTP_SERVER="ntp.ubuntu.com"
+    local SED_EXPRESSION=(
+        -e '/^NTP=.*/d'
+        -e '/^FallbackNTP=.*/d'
+        -e "/^\[Time\]/a NTP=${NTP_SERVER}\nFallbackNTP=${FALLBACK_NTP_SERVER}"
+    )
+
+    if ! sed "${SED_EXPRESSION[@]}" "${CONFIG_FILE}" | diff -q - "${CONFIG_FILE}" >"/dev/null"; then
+        print_plain "NTP server configuration requires changes. Updating..."
+        sudo sed -i "${SED_EXPRESSION[@]}" "${CONFIG_FILE}"
+        changes_made=true
+    fi
+
+    if ! timedatectl | grep -q 'NTP service: active'; then
+        print_plain "NTP service is not active. Enabling..."
+        timedatectl set-ntp true
+        changes_made=true
+    fi
+
+    if [ "${changes_made}" = true ]; then
+        print_info "Configuration changed. Restarting systemd-timesyncd service..."
+        sudo systemctl restart systemd-timesyncd
+    else
+        print_plain "No changes were necessary."
+    fi
+
+    print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/common"
+    setup_ntp_client "${@}"
+fi

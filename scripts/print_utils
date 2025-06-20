@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-
-indent() {
-    sed 's/^/  /'
-}
-
 print_color() {
     tput bold >&2
     tput setaf ${1} >&2
-    echo "${2}" >&2
+    print_plain "${2}"
     tput sgr0 >&2
 }
 

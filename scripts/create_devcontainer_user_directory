@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-
-source "${SCRIPT_DIR}/print_utils"
 
 create_devcontainer_user_directory() {
     START_TEXT="> Creating devcontainer user directory."
     END_TEXT="< Done creating devcontainer user directory."
 
     print_info "${START_TEXT}"
-    local DEVCONTAINER_USER_DIRECTORY=$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")
+    local DEVCONTAINER_USER_DIRECTORY=$(realpath "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/../.devcontainer-user")
     local PROJECT_NAME=$(basename $(dirname "${DEVCONTAINER_USER_DIRECTORY}"))
 
     if [[ -d "${DEVCONTAINER_USER_DIRECTORY}" ]]; then
@@ -18,12 +15,16 @@ create_devcontainer_user_directory() {
 
     mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
     echo ".env" >>"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/dockerfile.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
+    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/resources/dockerfile.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile"
+    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/resources/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
     print_info "${END_TEXT}"
 }
 
-create_devcontainer_user_directory
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/common"
+    create_devcontainer_user_directory "${@}"
+fi

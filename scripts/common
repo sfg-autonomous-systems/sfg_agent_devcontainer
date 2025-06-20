@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)/.."
+source "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/scripts/env_file_utils"
+source "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/scripts/print_utils"
