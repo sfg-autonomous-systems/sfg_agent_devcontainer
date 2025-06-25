@@ -11,7 +11,7 @@ instantiate_isaac_ros_dockerfile_template() {
     local dockerfile_user="${local_workspace_directory}/.devcontainer-user/dockerfile"
     local DOCKERFILE="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/docker/isaac_ros.dockerfile"
 
-    if [ -f "${DOCKERFILE_USER}" ]; then
+    if [ -f "${dockerfile_user}" ]; then
         sed -e "/:DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     else
         sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
