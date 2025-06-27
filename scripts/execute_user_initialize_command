@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
-execute_user_initialize_command() {
+sfg_isaac_ros_devcontainer__execute_user_initialize_command() {
     local local_workspace_directory="${1}"
     local user_initialize_command="${local_workspace_directory}/.devcontainer-user/user_initialize_command"
+
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Executing user initialize command '${user_initialize_command}'."
     local END_TEXT="< Done executing user initialize command '${user_initialize_command}'."
 
     if [ -f "${user_initialize_command}" ]; then
-        print_info "${START_TEXT}"
+        sfg_bash_utils__print_info "${START_TEXT}"
         "${user_initialize_command}" "${@}"
-        print_info "${END_TEXT}"
+        sfg_bash_utils__print_info "${END_TEXT}"
     fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    execute_user_initialize_command "${@}"
+    sfg_isaac_ros_devcontainer__execute_user_initialize_command "${@}"
 fi

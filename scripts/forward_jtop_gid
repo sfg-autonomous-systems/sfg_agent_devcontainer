@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
 
-forward_jtop_gid() {
+sfg_isaac_ros_devcontainer__forward_jtop_gid() {
     local environment_file="${1}"
+
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Forwarding jtop GID."
     local END_TEXT="< Done forwarding jtop GID."
 
-    print_info "${START_TEXT}"
+    sfg_bash_utils__print_info "${START_TEXT}"
 
     if [ -S "/run/jtop.sock" ]; then
-        set_environment_variable "${environment_file}" "LOCAL_JTOP_GID" "$(stat -c %g /run/jtop.sock)"
+        sfg_bash_utils__set_environment_variable "${environment_file}" "LOCAL_JTOP_GID" "$(stat -c %g /run/jtop.sock)"
     else
-        print_warning "Could not find jtop socket. If you are running on a jetson platform you should install 'https://github.com/rbonghi/jetson_stats'."
+        sfg_bash_utils__print_warning "Could not find jtop socket. If you are running on a jetson platform you should install 'https://github.com/rbonghi/jetson_stats'."
     fi
 
-    print_info "${END_TEXT}"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    forward_jtop_gid "${@}"
+    sfg_isaac_ros_devcontainer__forward_jtop_gid "${@}"
 fi

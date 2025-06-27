@@ -1,3 +1,9 @@
-[submodule "build_dependencies/isaac_ros_common"]
-	path = build_dependencies/isaac_ros_common
+[submodule "dependencies/isaac_ros_common"]
+	path = dependencies/isaac_ros_common
 	url = https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git
+[submodule "scripts/bash_utils"]
+	path = scripts/bash_utils
+	url = ../bash-utils.git
+[submodule "dependencies/fast_dds_router"]
+	path = dependencies/fast_dds_router
+	url = ../fast-dds-router.git

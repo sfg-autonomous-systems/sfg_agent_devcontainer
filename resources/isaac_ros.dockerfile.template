@@ -2,8 +2,8 @@
 ARG PLATFORM=arm64
 
 FROM --platform=arm64 isaac-ros-base AS isaac-ros-base-arm64
-COPY ".devcontainer/build_dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
-COPY ".devcontainer/build_dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
+COPY ".devcontainer/dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
+COPY ".devcontainer/dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
 
 FROM --platform=amd64 isaac-ros-base AS isaac-ros-base-amd64
 FROM isaac-ros-base-${PLATFORM} AS isaac-ros
@@ -83,12 +83,12 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
     chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
     usermod -aG video,plugdev,sudo "${USERNAME}";
 
-# Set our working directory.
-WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
 # Activate the previously created user.
 USER "${USERNAME}"
+# Set our working directory.
+WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
 # Ensure we can read/write to the working directory.
-RUN sudo chmod a+rwx "." && \
+RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
     # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
     [[ ${PLATFORM} == "amd64" ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
 

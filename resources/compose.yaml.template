@@ -1,7 +1,1 @@
 name: ${PROJECT_NAME}
-
-include:
-  - path:
-      - "../.devcontainer/compose/compose.isaac_ros.base.yaml"
-      - "../.devcontainer/compose/compose.isaac_ros.${PLATFORM}.yaml"
-      - "../.devcontainer/compose/compose.fast_dds_router.yaml"

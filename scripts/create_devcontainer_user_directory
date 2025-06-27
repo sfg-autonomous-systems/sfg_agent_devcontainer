@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
-create_devcontainer_user_directory() {
+sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+
     START_TEXT="> Creating devcontainer user directory."
     END_TEXT="< Done creating devcontainer user directory."
 
-    print_info "${START_TEXT}"
+    sfg_bash_utils__print_info "${START_TEXT}"
     local DEVCONTAINER_USER_DIRECTORY=$(realpath "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/../.devcontainer-user")
     local PROJECT_NAME=$(basename $(dirname "${DEVCONTAINER_USER_DIRECTORY}"))
 
     if [[ -d "${DEVCONTAINER_USER_DIRECTORY}" ]]; then
-        print_error "Error: Devcontainer user directory already exists."
+        sfg_bash_utils__print_error "Error: Devcontainer user directory already exists."
         exit 1
     fi
 
@@ -20,11 +23,9 @@ create_devcontainer_user_directory() {
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
     echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
-    print_info "${END_TEXT}"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    create_devcontainer_user_directory "${@}"
+    sfg_isaac_ros_devcontainer__create_devcontainer_user_directory "${@}"
 fi

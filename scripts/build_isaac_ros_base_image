@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
-build_isaac_ros_base_image() {
+sfg_isaac_ros_devcontainer__build_isaac_ros_base_image() {
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+
     local START_TEXT="> Building Isaac ROS base image."
     local END_TEXT="< Done building Isaac ROS base image."
 
-    print_info "${START_TEXT}"
+    sfg_bash_utils__print_info "${START_TEXT}"
     local platform=""
 
     case $(uname -m) in
@@ -17,15 +20,13 @@ build_isaac_ros_base_image() {
         ;;
     esac
 
-    "${SCRIPT_DIR}/../build_dependencies/isaac_ros_common/scripts/build_image_layers.sh" \
+    "${SCRIPT_DIR}/../dependencies/isaac_ros_common/scripts/build_image_layers.sh" \
         --image_key "${platform}.ros2_humble" \
         --image_name "isaac-ros-base"
 
-    print_info "${END_TEXT}"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    build_isaac_ros_base_image "${@}"
+    sfg_isaac_ros_devcontainer__build_isaac_ros_base_image "${@}"
 fi

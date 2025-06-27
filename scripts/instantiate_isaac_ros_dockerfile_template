@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 
-instantiate_isaac_ros_dockerfile_template() {
+sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
     local local_workspace_directory="${1}"
+
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Instantiating Isaac ROS dockerfile template."
     local END_TEXT="< Done instantiating Isaac ROS dockerfile template."
 
-    print_info "${START_TEXT}"
-    local DOCKERFILE_TEMPLATE="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/resources/isaac_ros.dockerfile.template"
+    sfg_bash_utils__print_info "${START_TEXT}"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/isaac_ros.dockerfile.template"
     local dockerfile_user="${local_workspace_directory}/.devcontainer-user/dockerfile"
-    local DOCKERFILE="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/docker/isaac_ros.dockerfile"
+    local DOCKERFILE="${SCRIPT_DIR}/../docker/isaac_ros.dockerfile"
 
     if [ -f "${dockerfile_user}" ]; then
         sed -e "/:DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
@@ -17,11 +20,9 @@ instantiate_isaac_ros_dockerfile_template() {
         sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     fi
 
-    print_info "${END_TEXT}"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    instantiate_isaac_ros_dockerfile_template "${@}"
+    sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${@}"
 fi

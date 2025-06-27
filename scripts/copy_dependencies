@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+sfg_isaac_ros_devcontainer__copy_dependencies() {
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Copying dependencies on host system into the docker build context."
+    local END_TEXT="< Done copying dependencies on host system into the docker build context."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+
+    local dependencies=()
+
+    case $(uname -m) in
+    "x86_64") ;;
+
+    "aarch64" | "arm64")
+        dependencies+=(
+            "/usr/src/jetson_multimedia_api"
+            "$(realpath /usr/lib/aarch64-linux-gnu/tegra)"
+        )
+        ;;
+    esac
+
+    for dependency in "${dependencies[@]}"; do
+        target_directory="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/dependencies/$(basename "${dependency}")"
+
+        if [ -d "${dependency}" ]; then
+            sfg_bash_utils__print_plain "Copying build dependency '${dependency}'."
+            rm -rf "${target_directory}" || true
+            cp -r "${dependency}" "${target_directory}"
+        else
+            sfg_bash_utils__print_error "Error: Build dependency '${dependency}' does not exist."
+            exit 1
+        fi
+    done
+
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    sfg_isaac_ros_devcontainer__copy_dependencies "${@}"
+fi

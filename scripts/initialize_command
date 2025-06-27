@@ -1,37 +1,50 @@
 #!/usr/bin/env bash
-source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)/common"
 
-execute_isaac_ros_devcontainer_initialize_command() {
+sfg_isaac_ros_devcontainer__initialize_command() {
     local local_workspace_directory="${1#*=}"
     local container_workspace_directory="${2#*=}"
+
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Invoking initialize command for Isaac ROS devcontainer."
     local END_TEXT="< Done invoking initialize command for Isaac ROS devcontainer."
 
-    print_info "${START_TEXT}"
+    sfg_bash_utils__print_info "${START_TEXT}"
 
     # Source all scripts.
-    for script in "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/scripts"/*; do
+    for script in "${SCRIPT_DIR}/bash_utils/"* "${SCRIPT_DIR}/"*; do
+        if [[ -d "${script}" ]]; then
+            continue
+        fi
+
+        if [[ "${BASH_SOURCE[0]}" == "${script}" ]]; then
+            continue
+        fi
+
         source "${script}"
     done
 
-    local ENVIRONMENT_FILE="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/../.devcontainer-user/.env"
+    source "${SCRIPT_DIR}/../dependencies/fast_dds_router/.devcontainer/scripts/initialize_command"
 
-    set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
-    configure_ros_domain_id "${ENVIRONMENT_FILE}"
-    setup_repository "${ENVIRONMENT_FILE}" "${local_workspace_directory}" "${container_workspace_directory}"
-    setup_ntp_client
-    forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
-    forward_user "${ENVIRONMENT_FILE}"
-    forward_platform "${ENVIRONMENT_FILE}"
-    forward_jtop_gid "${ENVIRONMENT_FILE}"
-    copy_build_dependencies
-    execute_user_initialize_command "${local_workspace_directory}" "${@}"
-    build_isaac_ros_base_image
-    instantiate_isaac_ros_dockerfile_template "${local_workspace_directory}"
-    print_info "${END_TEXT}"
+    local ENVIRONMENT_FILE="${SCRIPT_DIR}/../compose/.env"
+
+    sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
+    sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
+    sfg_bash_utils__setup_repository "${ENVIRONMENT_FILE}" "${local_workspace_directory}" "${container_workspace_directory}"
+    sfg_bash_utils__setup_ntp_client
+    sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
+    sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
+    sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
+    sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
+    sfg_isaac_ros_devcontainer__copy_dependencies
+    sfg_isaac_ros_devcontainer__execute_user_initialize_command "${local_workspace_directory}" "${@}"
+    sfg_isaac_ros_devcontainer__build_isaac_ros_base_image
+    sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${local_workspace_directory}"
+    sfg_fast_dds_router__initialize_command LOCAL_WORKSPACE_DIRECTORY="${SCRIPT_DIR}/../dependencies/fast_dds_router" CONTAINER_WORKSPACE_DIRECTORY="/workspaces"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    execute_isaac_ros_devcontainer_initialize_command "${@}"
+    sfg_isaac_ros_devcontainer__initialize_command "${@}"
 fi

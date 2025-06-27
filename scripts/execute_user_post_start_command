@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 
-execute_user_post_start_command() {
+sfg_isaac_ros_devcontainer__execute_user_post_start_command() {
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+
     local USER_POST_START_COMMAND="${REPOSITORY_DIRECTORY}/.devcontainer-user/user_post_start_command"
     local START_TEXT="> Executing user post start command '${USER_POST_START_COMMAND}'."
     local END_TEXT="< Done executing user post start command '${USER_POST_START_COMMAND}'."
 
     if [ -f "${USER_POST_START_COMMAND}" ]; then
-        print_info "${START_TEXT}"
+        sfg_bash_utils__print_info "${START_TEXT}"
         "${USER_POST_START_COMMAND}"
-        print_info "${END_TEXT}"
+        sfg_bash_utils__print_info "${END_TEXT}"
     fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    source "${SCRIPT_DIR}/common"
-    execute_user_post_start_command "${@}"
+    sfg_isaac_ros_devcontainer__execute_user_post_start_command "${@}"
 fi
