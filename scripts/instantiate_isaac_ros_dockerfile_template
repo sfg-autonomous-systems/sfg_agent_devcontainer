@@ -10,9 +10,9 @@ sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
     local END_TEXT="< Done instantiating Isaac ROS dockerfile template."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/isaac_ros.dockerfile.template"
-    local dockerfile_user="${local_workspace_directory}/.devcontainer-user/dockerfile"
-    local DOCKERFILE="${SCRIPT_DIR}/../docker/isaac_ros.dockerfile"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/dockerfile.isaac_ros.template"
+    local dockerfile_user="${local_workspace_directory}/.devcontainer-user/dockerfile.user"
+    local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.isaac_ros"
 
     if [ -f "${dockerfile_user}" ]; then
         sed -e "/:DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"

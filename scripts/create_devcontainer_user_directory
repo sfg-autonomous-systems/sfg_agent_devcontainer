@@ -3,13 +3,13 @@
 sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
     local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
     source "${SCRIPT_DIR}/bash_utils/common"
+    source "${SCRIPT_DIR}/get_project_name"
 
     START_TEXT="> Creating devcontainer user directory."
     END_TEXT="< Done creating devcontainer user directory."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local DEVCONTAINER_USER_DIRECTORY=$(realpath "${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/../.devcontainer-user")
-    local PROJECT_NAME=$(basename $(dirname "${DEVCONTAINER_USER_DIRECTORY}"))
+    local DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer-user")"
 
     if [[ -d "${DEVCONTAINER_USER_DIRECTORY}" ]]; then
         sfg_bash_utils__print_error "Error: Devcontainer user directory already exists."
@@ -17,11 +17,10 @@ sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
     fi
 
     mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
-    echo ".env" >>"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/resources/dockerfile.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile"
-    PROJECT_NAME=${PROJECT_NAME} envsubst '${PROJECT_NAME}' <"${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/resources/compose.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.yaml"
-    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
-    echo "#!/usr/bin/env bash" >"${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
+    cp "${SCRIPT_DIR}/../resources/compose.user.yaml.template" "${DEVCONTAINER_USER_DIRECTORY}/compose.user.yaml"
+    PROJECT_NAME=$(sfg_isaac_ros_devcontainer__get_project_name) envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/dockerfile.user.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile.user"
+    cp "${SCRIPT_DIR}/../resources/user_initialize_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
+    cp "${SCRIPT_DIR}/../resources/user_post_start_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
     sfg_bash_utils__print_info "${END_TEXT}"
 }

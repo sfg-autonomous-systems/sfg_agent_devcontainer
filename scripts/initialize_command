@@ -36,6 +36,7 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
+    sfg_isaac_ros_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__copy_dependencies
     sfg_isaac_ros_devcontainer__execute_user_initialize_command "${local_workspace_directory}" "${@}"

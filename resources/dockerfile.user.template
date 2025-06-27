@@ -1,0 +1,3 @@
+FROM isaac-ros AS ${PROJECT_NAME}
+
+# Your dockerfile content goes here...

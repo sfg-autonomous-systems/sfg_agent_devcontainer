@@ -1,8 +1,10 @@
+name: ${PROJECT_NAME}
+
 include:
   - path:
       - "./compose.isaac_ros.base.yaml"
       - "./compose.isaac_ros.${PLATFORM}.yaml"
-      - "../../.devcontainer-user/compose.yaml"
+      - "../../.devcontainer-user/compose.user.yaml"
     env_file:
       - "./.env"
   - path:

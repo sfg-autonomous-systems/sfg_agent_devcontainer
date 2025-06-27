@@ -2,7 +2,7 @@ services:
   isaac_ros:
     build:
       context: "../.."
-      dockerfile: ".devcontainer/docker/isaac_ros.dockerfile"
+      dockerfile: ".devcontainer/docker/dockerfile.isaac_ros"
       args:
         - PLATFORM=${PLATFORM}
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
