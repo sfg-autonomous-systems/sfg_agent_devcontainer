@@ -8,6 +8,6 @@ include:
     env_file:
       - "./.env"
   - path:
-      - "../dependencies/fast_dds_router/.devcontainer/compose/compose.fast_dds_router.yaml"
+      - "../dependencies/fast_dds_router/.devcontainer/compose/compose.yaml"
     env_file:
       - "../dependencies/fast_dds_router/.devcontainer/compose/.env"
