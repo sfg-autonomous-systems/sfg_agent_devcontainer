@@ -4,6 +4,3 @@
 [submodule "scripts/bash_utils"]
 	path = scripts/bash_utils
 	url = ../bash-utils.git
-[submodule "dependencies/fast_dds_router"]
-	path = dependencies/fast_dds_router
-	url = ../fast-dds-router.git

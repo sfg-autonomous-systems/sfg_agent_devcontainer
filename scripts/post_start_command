@@ -5,7 +5,9 @@ sfg_isaac_ros_devcontainer__post_start_command() {
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/execute_user_post_start_command"
 
-    sfg_isaac_ros_devcontainer__execute_user_post_start_command "${@}"
+    local DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
+
+    sfg_isaac_ros_devcontainer__execute_user_post_start_command "${DEVCONTAINER_USER_DIRECTORY}" "${@}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

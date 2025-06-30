@@ -25,9 +25,8 @@ sfg_isaac_ros_devcontainer__initialize_command() {
         source "${script}"
     done
 
-    source "${SCRIPT_DIR}/../dependencies/fast_dds_router/.devcontainer/scripts/initialize_command"
-
     local ENVIRONMENT_FILE="${SCRIPT_DIR}/../compose/.env"
+    local DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
 
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
     sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
@@ -39,10 +38,9 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     sfg_isaac_ros_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__copy_dependencies
-    sfg_isaac_ros_devcontainer__execute_user_initialize_command "${local_workspace_directory}" "${@}"
+    sfg_isaac_ros_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${@}"
     sfg_isaac_ros_devcontainer__build_isaac_ros_base_image
-    sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${local_workspace_directory}"
-    sfg_fast_dds_router__initialize_command LOCAL_WORKSPACE_DIRECTORY="${SCRIPT_DIR}/../dependencies/fast_dds_router" CONTAINER_WORKSPACE_DIRECTORY="/workspaces"
+    sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 

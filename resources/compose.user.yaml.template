@@ -1,0 +1,5 @@
+name: sfg-${PROJECT_NAME}
+
+include:
+  - path:
+      - "../.devcontainer/compose/compose.yaml"

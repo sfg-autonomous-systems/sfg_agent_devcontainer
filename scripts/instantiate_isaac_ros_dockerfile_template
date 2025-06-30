@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
-    local local_workspace_directory="${1}"
+    local devcontainer_user_directory="${1}"
 
     local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
     source "${SCRIPT_DIR}/bash_utils/common"
@@ -11,7 +11,7 @@ sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
 
     sfg_bash_utils__print_info "${START_TEXT}"
     local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/dockerfile.isaac_ros.template"
-    local dockerfile_user="${local_workspace_directory}/.devcontainer-user/dockerfile.user"
+    local dockerfile_user="${devcontainer_user_directory}/dockerfile.user"
     local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.isaac_ros"
 
     if [ -f "${dockerfile_user}" ]; then

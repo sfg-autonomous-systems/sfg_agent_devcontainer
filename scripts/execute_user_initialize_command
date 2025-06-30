@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 sfg_isaac_ros_devcontainer__execute_user_initialize_command() {
-    local local_workspace_directory="${1}"
-    local user_initialize_command="${local_workspace_directory}/.devcontainer-user/user_initialize_command"
+    local devcontainer_user_directory="${1}"
 
     local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
     source "${SCRIPT_DIR}/bash_utils/common"
+    local user_initialize_command="${devcontainer_user_directory}/user_initialize_command"
 
     local START_TEXT="> Executing user initialize command '${user_initialize_command}'."
     local END_TEXT="< Done executing user initialize command '${user_initialize_command}'."
