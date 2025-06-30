@@ -23,7 +23,7 @@ sfg_isaac_ros_devcontainer__copy_dependencies() {
     esac
 
     for dependency in "${dependencies[@]}"; do
-        target_directory="${ISAAC_ROS_DEVCONTAINER_PROJECT_ROOT}/dependencies/$(basename "${dependency}")"
+        target_directory="${SCRIPT_DIR}/../dependencies/$(basename "${dependency}")"
 
         if [ -d "${dependency}" ]; then
             sfg_bash_utils__print_plain "Copying build dependency '${dependency}'."
