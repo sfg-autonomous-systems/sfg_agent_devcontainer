@@ -38,6 +38,7 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     sfg_isaac_ros_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__copy_dependencies
+    sfg_isaac_ros_devcontainer__configure_firewall
     sfg_isaac_ros_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${@}"
     sfg_isaac_ros_devcontainer__build_isaac_ros_base_image
     sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"

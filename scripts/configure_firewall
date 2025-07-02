@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+sfg_isaac_ros_devcontainer__configure_firewall() {
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    START_TEXT="> Configuring firewall."
+    END_TEXT="< Done configuring firewall."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+
+    if ! command -v ufw &>"/dev/null"; then
+        sfg_bash_utils__print_plain "No firewall is installed, nothing needs to be done."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    local MESSAGE="Firewall detected. Do you want to configure it? This requires sudo privileges. [y/N]"
+    read -rp "${MESSAGE}" confirm
+
+    if [[ ! "${confirm}" == y ]]; then
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return
+    fi
+
+    # This allows ROS2 multicast traffic for discovery and communication.
+    sudo ufw allow in proto udp to 224.0.0.0/4
+    sudo ufw allow out proto udp to 224.0.0.0/4
+    sudo ufw reload
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    sfg_isaac_ros_devcontainer__configure_firewall "${@}"
+fi
