@@ -24,8 +24,7 @@ sfg_isaac_ros_devcontainer__configure_firewall() {
     fi
 
     # This allows ROS2 multicast traffic for discovery and communication.
-    sudo ufw allow in proto udp to 224.0.0.0/4
-    sudo ufw allow out proto udp to 224.0.0.0/4
+    sudo ufw allow from 192.168.50.0/24
     sudo ufw reload
     sfg_bash_utils__print_info "${END_TEXT}"
 }
