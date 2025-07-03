@@ -8,7 +8,6 @@ sfg_isaac_ros_devcontainer__copy_dependencies() {
     local END_TEXT="< Done copying dependencies on host system into the docker build context."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-
     local dependencies=()
 
     case $(uname -m) in

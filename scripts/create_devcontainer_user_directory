@@ -5,8 +5,8 @@ sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/get_project_name"
 
-    START_TEXT="> Creating devcontainer user directory."
-    END_TEXT="< Done creating devcontainer user directory."
+    local START_TEXT="> Creating devcontainer user directory."
+    local END_TEXT="< Done creating devcontainer user directory."
 
     sfg_bash_utils__print_info "${START_TEXT}"
     local DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"

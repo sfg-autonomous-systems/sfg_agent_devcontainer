@@ -4,8 +4,8 @@ sfg_isaac_ros_devcontainer__configure_firewall() {
     local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
     source "${SCRIPT_DIR}/bash_utils/common"
 
-    START_TEXT="> Configuring firewall."
-    END_TEXT="< Done configuring firewall."
+    local START_TEXT="> Configuring firewall."
+    local END_TEXT="< Done configuring firewall."
 
     sfg_bash_utils__print_info "${START_TEXT}"
 
