@@ -20,7 +20,7 @@ sfg_isaac_ros_devcontainer__configure_firewall() {
 
     if [[ ! "${confirm}" == y ]]; then
         sfg_bash_utils__print_info "${END_TEXT}"
-        return
+        return 0
     fi
 
     # This allows ROS2 multicast traffic for discovery and communication.
