@@ -74,7 +74,7 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
         CONFLICTING_USERNAME=`getent passwd "${USER_UID}" | cut -d: -f1` && \
         usermod -l "${USERNAME}" -u "${USER_UID}" -m -d "/home/${USERNAME}" "${CONFLICTING_USERNAME}" &>"/dev/null" && \
         mkdir -p "/home/${USERNAME}" && \
-        # Wipe files that may create issues for users with large uid numbers.
+        # Wipe files that may create issues for users with large UID numbers.
         rm -f "/var/log/lastlog /var/log/faillog"; \
     fi; \
     \

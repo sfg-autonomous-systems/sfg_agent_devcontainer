@@ -32,6 +32,9 @@
                         ]
                     }
                 },
+                "workbench.view.showQuietly": {
+                    "workbench.panel.output": true
+                },
                 "docker.languageserver.formatter.ignoreMultilineInstructions": true,
                 "docker.lsp.experimental.vulnerabilityScanning": false,
                 "docker.extension.dockerEngineAvailabilityPrompt": false,
