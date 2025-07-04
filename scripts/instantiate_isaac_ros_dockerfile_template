@@ -15,9 +15,9 @@ sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
     local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.isaac_ros"
 
     if [ -f "${dockerfile_user}" ]; then
-        sed -e "/:DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
+        sed -e "/# :DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     else
-        sed -e "/:DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
+        sed -e "/# :DOCKERFILE_USER:/d" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
     fi
 
     sfg_bash_utils__print_info "${END_TEXT}"
