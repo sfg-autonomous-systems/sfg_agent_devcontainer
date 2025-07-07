@@ -11,7 +11,6 @@ services:
         - USERNAME=${LOCAL_USERNAME}
         - USER_UID=${LOCAL_USER_UID}
         - USER_GID=${LOCAL_USER_GID}
-    restart: unless-stopped
     volumes:
       - type: bind
         source: "../.."
@@ -32,6 +31,7 @@ services:
         read_only: true
     environment:
       - DISPLAY
+      - TERM
       - NVIDIA_DRIVER_CAPABILITIES=all
     network_mode: host
     privileged: true

@@ -1,0 +1,14 @@
+[Unit]
+Requires=docker.service
+After=docker.service
+
+[Service]
+User=${USERNAME}
+WorkingDirectory=${WORKING_DIRECTORY}
+ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --build --abort-on-container-failure
+ExecStop="/usr/bin/docker" compose down
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

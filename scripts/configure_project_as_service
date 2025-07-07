@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+sfg_isaac_ros_devcontainer__configure_project_as_service() {
+    local devcontainer_user_directory="${1}"
+
+    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    source "${SCRIPT_DIR}/bash_utils/common"
+    source "${SCRIPT_DIR}/get_project_name"
+
+    local START_TEXT="> Configuring project as service."
+    local END_TEXT="< Done configuring project as service."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+    local SERVICE_TEMPLATE="${SCRIPT_DIR}/../resources/service.template"
+    local service_filename="sfg-$(sfg_isaac_ros_devcontainer__get_project_name).service"
+    local service_filepath="/etc/systemd/system/${service_filename}"
+
+    if [[ ! -f "${service_filepath}" ]]; then
+        local MESSAGE="The project is currently not enabled to run as a service on system boot. Do you want to enable it? [y/N] "
+        read -rp "${MESSAGE}" confirm
+
+        if [[ ! "${confirm}" == y ]]; then
+            sfg_bash_utils__print_info "${END_TEXT}"
+            return 0
+        fi
+
+        USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" envsubst '${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
+        sudo systemctl daemon-reload
+        sudo systemctl enable "${service_filename}"
+    else
+        local MESSAGE="The project is currently enabled to run as a service on system boot. Do you want to disable it? [y/N] "
+        read -rp "${MESSAGE}" confirm
+
+        if [[ ! "${confirm}" == y ]]; then
+            sfg_bash_utils__print_info "${END_TEXT}"
+            return 0
+        fi
+
+        sudo systemctl disable "${service_filename}"
+        sudo rm "${service_filepath}"
+    fi
+
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    sfg_isaac_ros_devcontainer__configure_project_as_service "${@}"
+fi
