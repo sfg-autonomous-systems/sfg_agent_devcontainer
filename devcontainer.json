@@ -2,8 +2,10 @@
     "name": "Isaac ROS",
     "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer_user/compose.user.yaml",
     "service": "isaac_ros",
-    "overrideCommand": true,
     "workspaceFolder": "/workspaces",
+    "containerEnv": {
+        "DEVCONTAINER_MODE": ""
+    },
     "initializeCommand": [
         "${localWorkspaceFolder}/.devcontainer/scripts/initialize_command",
         // Local paths.

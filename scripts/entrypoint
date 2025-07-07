@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+sfg_isaac_ros_devcontainer__entrypoint() {
+    if [[ -v DEVCONTAINER_MODE ]]; then
+        exec tail -f "/dev/null"
+    else
+        exec "${@}"
+    fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    sfg_isaac_ros_devcontainer__entrypoint "${@}"
+fi
