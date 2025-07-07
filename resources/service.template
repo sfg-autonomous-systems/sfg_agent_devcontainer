@@ -1,6 +1,6 @@
 [Unit]
-Requires=docker.service
-After=docker.service
+Requires=docker.socket
+After=docker.socket
 
 [Service]
 User=${USERNAME}
