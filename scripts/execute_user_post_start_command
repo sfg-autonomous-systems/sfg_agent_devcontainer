@@ -3,7 +3,8 @@
 sfg_isaac_ros_devcontainer__execute_user_post_start_command() {
     local devcontainer_user_directory="${1}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
     local user_post_start_command="${devcontainer_user_directory}/user_post_start_command"
 
@@ -18,5 +19,6 @@ sfg_isaac_ros_devcontainer__execute_user_post_start_command() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__execute_user_post_start_command "${@}"
 fi

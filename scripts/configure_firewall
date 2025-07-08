@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 sfg_isaac_ros_devcontainer__configure_firewall() {
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Configuring firewall."
@@ -24,11 +25,30 @@ sfg_isaac_ros_devcontainer__configure_firewall() {
     fi
 
     # This allows ROS2 multicast traffic for discovery and communication.
-    sudo ufw allow from 192.168.50.0/24
+    local default_interface
+    default_interface="$(ip route | grep '^default' | awk '{print $5}' | head -n 1)"
+
+    if [[ -z "${default_interface}" ]]; then
+        sfg_bash_utils__print_error "Error: Could not determine the default network interface. Cannot configure firewall."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 1
+    fi
+
+    local subnet
+    subnet="$(ip route | grep "dev ${default_interface}" | grep 'proto kernel scope link' | awk '{print $1}' | head -n 1)"
+
+    if [[ -z "${subnet}" ]]; then
+        sfg_bash_utils__print_error "Error: Could not determine the subnet for interface '${default_interface}'. Cannot configure firewall."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 1
+    fi
+
+    sudo ufw allow from "${subnet}"
     sudo ufw reload
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__configure_firewall "${@}"
 fi

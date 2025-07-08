@@ -4,7 +4,8 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     local local_workspace_directory="${1#*=}"
     local container_workspace_directory="${2#*=}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Invoking initialize command for Isaac ROS devcontainer."
@@ -26,7 +27,8 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     done
 
     local ENVIRONMENT_FILE="${SCRIPT_DIR}/../compose/.env"
-    local DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
+    local DEVCONTAINER_USER_DIRECTORY
+    DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
 
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
     sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
@@ -47,5 +49,6 @@ sfg_isaac_ros_devcontainer__initialize_command() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__initialize_command "${@}"
 fi

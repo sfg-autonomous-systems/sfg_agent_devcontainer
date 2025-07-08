@@ -3,7 +3,8 @@
 sfg_isaac_ros_devcontainer__forward_jtop_gid() {
     local environment_file="${1}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Forwarding jtop GID."
@@ -21,5 +22,6 @@ sfg_isaac_ros_devcontainer__forward_jtop_gid() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${@}"
 fi

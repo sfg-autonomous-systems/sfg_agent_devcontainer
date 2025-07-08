@@ -3,7 +3,8 @@
 sfg_isaac_ros_devcontainer__forward_project_name() {
     local environment_file="${1}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/get_project_name"
 
@@ -16,5 +17,6 @@ sfg_isaac_ros_devcontainer__forward_project_name() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__forward_project_name "${@}"
 fi

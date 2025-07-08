@@ -3,7 +3,8 @@
 sfg_isaac_ros_devcontainer__configure_project_as_service() {
     local devcontainer_user_directory="${1}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/get_project_name"
 
@@ -12,7 +13,8 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
 
     sfg_bash_utils__print_info "${START_TEXT}"
     local SERVICE_TEMPLATE="${SCRIPT_DIR}/../resources/service.template"
-    local service_filename="sfg-$(sfg_isaac_ros_devcontainer__get_project_name).service"
+    local service_filename
+    service_filename="sfg-$(sfg_isaac_ros_devcontainer__get_project_name).service"
     local service_filepath="/etc/systemd/system/${service_filename}"
 
     if [[ ! -f "${service_filepath}" ]]; then
@@ -24,7 +26,8 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
             return 0
         fi
 
-        USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" envsubst '${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
+        USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" \
+            envsubst '${PROJECT_NAME} ${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
         sudo systemctl daemon-reload
         sudo systemctl enable "${service_filename}"
     else
@@ -44,5 +47,6 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__configure_project_as_service "${@}"
 fi

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 sfg_isaac_ros_devcontainer__get_project_name() {
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
-    local PROJECT_NAME=$(basename $(realpath "${SCRIPT_DIR}/../.."))
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    local PROJECT_NAME
+    PROJECT_NAME="$(basename "$(realpath "${SCRIPT_DIR}/../..")")"
     echo "${PROJECT_NAME//_/-}"
 }

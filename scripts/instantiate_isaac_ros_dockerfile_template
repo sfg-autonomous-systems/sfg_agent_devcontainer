@@ -3,7 +3,8 @@
 sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
     local devcontainer_user_directory="${1}"
 
-    local SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
 
     local START_TEXT="> Instantiating Isaac ROS dockerfile template."
@@ -24,5 +25,6 @@ sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
     sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template "${@}"
 fi
