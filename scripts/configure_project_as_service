@@ -26,6 +26,7 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
             return 0
         fi
 
+        # shellcheck disable=SC2016
         PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" \
             envsubst '${PROJECT_NAME} ${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
         sudo systemctl daemon-reload
