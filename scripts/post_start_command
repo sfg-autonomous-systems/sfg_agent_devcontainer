@@ -2,7 +2,7 @@
 
 sfg_isaac_ros_devcontainer__post_start_command() {
     local SCRIPT_DIR
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/execute_user_post_start_command"
 
