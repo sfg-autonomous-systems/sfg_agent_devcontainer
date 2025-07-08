@@ -17,7 +17,7 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
     service_filename="sfg-$(sfg_isaac_ros_devcontainer__get_project_name).service"
     local service_filepath="/etc/systemd/system/${service_filename}"
 
-    if ! systemctl is-enabled --quiet "${service_filename}"; then
+    if ! systemctl is-enabled --quiet "${service_filename}" &>"/dev/null"; then
         local MESSAGE="The project is currently not enabled to run as a service on system boot. Do you want to enable it? [y/N] "
         read -rp "${MESSAGE}" confirm
 
