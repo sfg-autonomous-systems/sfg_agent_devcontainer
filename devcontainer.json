@@ -50,6 +50,9 @@
                     "azcli",
                     "bats"
                 ],
+                "shellcheck.customArgs": [
+                    "--external-sources"
+                ],
                 // Python settings.
                 "python.languageServer": "Pylance",
                 "debugpy.debugJustMyCode": false,
