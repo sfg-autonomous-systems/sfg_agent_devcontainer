@@ -26,7 +26,7 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
             return 0
         fi
 
-        USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" \
+        PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" \
             envsubst '${PROJECT_NAME} ${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
         sudo systemctl daemon-reload
         sudo systemctl enable "${service_filename}"

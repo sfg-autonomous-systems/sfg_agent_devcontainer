@@ -1,5 +1,5 @@
 [Unit]
-Description=Service to auto start stack for sfg-{PROJECT_NAME} on system boot.
+Description=Service to auto start stack for sfg-${PROJECT_NAME} on system boot.
 Requires=docker.socket
 After=docker.socket
 
