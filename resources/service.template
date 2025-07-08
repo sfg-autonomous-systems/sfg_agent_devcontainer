@@ -1,10 +1,10 @@
 [Unit]
-Description=Service to auto start stack for sfg-${PROJECT_NAME} on system boot.
+Description=Service to auto start software stack for sfg-${PROJECT_NAME} on system boot.
 Requires=docker.socket
 After=docker.socket
 
 # Stop trying to restart if it fails 3 times within 2 minutes.
-StartLimitBurst=3
+StartLimitBurst=5
 StartLimitIntervalSec=120s
 
 [Service]
