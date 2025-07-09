@@ -1,14 +1,14 @@
 [Unit]
 Description=Service to auto start software stack for sfg-${PROJECT_NAME} on system boot.
-Requires=docker.socket
-After=docker.socket
+Requires=docker.service systemd-time-wait-sync.service
+After=docker.service systemd-time-wait-sync.service
 StartLimitBurst=5
 StartLimitIntervalSec=120s
 
 [Service]
 User=${USERNAME}
 WorkingDirectory=${WORKING_DIRECTORY}
-ExecStartPre="/usr/bin/nm-online"
+ExecStartPre="/usr/bin/nm-online" --timeout=60
 ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --build --abort-on-container-failure
 ExecStop="/usr/bin/docker" compose down
 Restart=on-failure
