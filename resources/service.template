@@ -1,18 +1,20 @@
 [Unit]
-Description=Service to auto start software stack for sfg-${PROJECT_NAME} on system boot.
-Requires=docker.service systemd-time-wait-sync.service
-After=docker.service systemd-time-wait-sync.service
+Description=Service to auto start software stack for ${PROJECT_NAME} on system boot.
+After=docker.service
 StartLimitBurst=5
 StartLimitIntervalSec=120s
 
 [Service]
-User=${USERNAME}
 WorkingDirectory=${WORKING_DIRECTORY}
-ExecStartPre="/usr/bin/nm-online" --timeout=60
+# Wait for internet connection to be established.
+ExecStartPre="/usr/bin/nm-online"
+# Wait for time to be synced.
+ExecStartPre="/bin/sh" -c 'until timedatectl status | grep -q "System clock synchronized: yes"; do sleep 1; done'
 ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --build --abort-on-container-failure
 ExecStop="/usr/bin/docker" compose down
 Restart=on-failure
 RestartSec=10s
+TimeoutStartSec=infinity
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

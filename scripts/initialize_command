@@ -7,6 +7,7 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
+    source "${SCRIPT_DIR}/get_project_name"
 
     local START_TEXT="> Invoking initialize command for Isaac ROS devcontainer."
     local END_TEXT="< Done invoking initialize command for Isaac ROS devcontainer."
@@ -38,6 +39,8 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
+
+    sfg_isaac_ros_devcontainer__stop_project_service
     sfg_isaac_ros_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_isaac_ros_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"

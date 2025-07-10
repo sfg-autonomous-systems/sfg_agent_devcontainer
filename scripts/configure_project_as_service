@@ -14,10 +14,12 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
     sfg_bash_utils__print_info "${START_TEXT}"
     local SERVICE_TEMPLATE="${SCRIPT_DIR}/../resources/service.template"
     local service_filename
-    service_filename="sfg-$(sfg_isaac_ros_devcontainer__get_project_name).service"
-    local service_filepath="/etc/systemd/system/${service_filename}"
+    service_filename="$(sfg_isaac_ros_devcontainer__get_project_name).service"
+    local service_filepath="${HOME}/.config/systemd/user/${service_filename}"
 
-    if ! systemctl is-enabled --quiet "${service_filename}" &>"/dev/null"; then
+    mkdir -p "$(dirname "${service_filepath}")"
+
+    if ! systemctl --user is-enabled --quiet "${service_filename}" &>"/dev/null"; then
         local MESSAGE="The project is currently not enabled to run as a service on system boot. Do you want to enable it? [y/N] "
         read -rp "${MESSAGE}" confirm
 
@@ -27,10 +29,15 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
         fi
 
         # shellcheck disable=SC2016
-        PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" USERNAME=$(whoami) WORKING_DIRECTORY="${devcontainer_user_directory}" \
-            envsubst '${PROJECT_NAME} ${USERNAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" | sudo tee "${service_filepath}" >"/dev/null"
-        sudo systemctl daemon-reload
-        sudo systemctl enable "${service_filename}"
+        PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" WORKING_DIRECTORY="${devcontainer_user_directory}" \
+            envsubst '${PROJECT_NAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" >"${service_filepath}"
+        systemctl --user daemon-reload
+        systemctl --user enable "${service_filename}"
+
+        if ! loginctl show-user "$(whoami)" | grep -q "Linger=yes"; then
+            sfg_bash_utils__print_plain "Enabling linger for user $(whoami)..."
+            sudo loginctl enable-linger "$(whoami)"
+        fi
     else
         local MESSAGE="The project is currently enabled to run as a service on system boot. Do you want to disable it? [y/N] "
         read -rp "${MESSAGE}" confirm
@@ -40,8 +47,18 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
             return 0
         fi
 
-        sudo systemctl disable "${service_filename}"
-        sudo rm "${service_filepath}"
+        systemctl --user disable "${service_filename}"
+        rm "${service_filepath}"
+
+        if loginctl show-user "$(whoami)" | grep -q "Linger=yes"; then
+            local message
+            message="For the service to start on boot, linger was enabled for user $(whoami). Do you want to disable it? [y/N] "
+            read -rp "${message}" confirm
+
+            if [[ "${confirm}" == y ]]; then
+                sudo loginctl disable-linger "$(whoami)"
+            fi
+        fi
     fi
 
     sfg_bash_utils__print_info "${END_TEXT}"
