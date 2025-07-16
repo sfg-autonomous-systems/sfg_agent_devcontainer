@@ -45,7 +45,7 @@ ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 #########################################################################################################
 # Apply patches.                                                                                        #
 #########################################################################################################
-WORKDIR "/"
+WORKDIR /
 
 RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
     for PATCH in "/tmp/patches/${PLATFORM}/"*".patch"; do \
@@ -85,9 +85,9 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
     usermod -aG video,plugdev,sudo "${USERNAME}";
 
 # Activate the previously created user.
-USER "${USERNAME}"
+USER ${USERNAME}
 # Set our working directory.
-WORKDIR "${CONTAINER_WORKSPACE_DIRECTORY}"
+WORKDIR ${CONTAINER_WORKSPACE_DIRECTORY}
 # Ensure we can read/write to the working directory.
 RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
     # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
