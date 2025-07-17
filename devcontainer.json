@@ -72,7 +72,8 @@
                 "[cmake]": {
                     "editor.defaultFormatter": "josetr.cmake-language-support-vscode"
                 },
-                "cmake.languageSupport.dotnetPath": "/usr/bin/dotnet"
+                "cmake.languageSupport.dotnetPath": "/usr/bin/dotnet",
+                "cmake.configureOnOpen": false
             },
             "extensions": [
                 // General extensions.
