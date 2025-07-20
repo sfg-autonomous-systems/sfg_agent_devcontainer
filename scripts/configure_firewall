@@ -16,7 +16,7 @@ sfg_isaac_ros_devcontainer__configure_firewall() {
         return 0
     fi
 
-    local MESSAGE="Firewall detected. Do you want to configure it? [y/N]"
+    local MESSAGE="Firewall detected. Do you want to configure it? [y/N] "
     read -rp "${MESSAGE}" confirm
 
     if [[ ! "${confirm}" == y ]]; then
