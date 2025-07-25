@@ -10,7 +10,7 @@ WorkingDirectory=${WORKING_DIRECTORY}
 ExecStartPre="/usr/bin/nm-online"
 # Wait for time to be synced.
 ExecStartPre="/bin/sh" -c 'until timedatectl status | grep -q "System clock synchronized: yes"; do sleep 1; done'
-ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --build --abort-on-container-failure
+ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --abort-on-container-failure
 ExecStop="/usr/bin/docker" compose down
 Restart=on-failure
 RestartSec=10s
