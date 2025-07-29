@@ -40,6 +40,9 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         dotnet-sdk-6.0 && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
+RUN pip install \
+        pybind11-stubgen
+
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 #########################################################################################################
