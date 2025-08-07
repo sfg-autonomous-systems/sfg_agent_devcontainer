@@ -1,0 +1,4 @@
+build:
+  mixin:
+    - compile-commands
+  symlink-install: true

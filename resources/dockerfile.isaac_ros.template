@@ -191,18 +191,19 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
     done && \
     \
     rm -rf "${HOME}/dependencies" && \
-    sudo rm -rf "${HOME}/.ros/rosdep/"* 
+    sudo rm -rf "${HOME}/.ros/rosdep/"*
 
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
+        ros-humble-magic-enum \
         python3-colcon-mixin && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
-    mkdir -p "${HOME}/.colcon" && \
-    echo "build: {mixin: [compile-commands]}" >>"${HOME}/.colcon/defaults.yaml" && \
     echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" | sudo tee -a "/etc/bash.bashrc"
+
+COPY ".devcontainer/resources/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
 
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
