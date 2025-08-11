@@ -40,8 +40,9 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         dotnet-sdk-6.0 && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
-RUN pip install \
-        pybind11-stubgen
+RUN pip install --upgrade \
+        pybind11[global] \
+        pybind11-stubgen 
 
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
@@ -141,6 +142,8 @@ RUN if [[ ${PLATFORM} == "arm64" ]]; then \
             cd "${package}" && \
             # Generate debian files.
             bloom-generate rosdebian && \
+            # Disable building tests and treat deprecation warnings as non-fatal.
+            sed -i 's/dh_auto_configure --/dh_auto_configure -- -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations"/g' "debian/rules" && \
             # Use all cores for building.
             sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
             # Ignore missing info for shlibdeps.
@@ -195,7 +198,7 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
 
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
-        ros-humble-magic-enum \
+        ros-${ROS_DISTRO}-magic-enum \
         python3-colcon-mixin && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     \
