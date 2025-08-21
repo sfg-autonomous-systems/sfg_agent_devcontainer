@@ -111,8 +111,10 @@ RUN wget -qO - "https://isaac.download.nvidia.com/isaac-ros/repos.key" | sudo ap
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
 # Install ffmpeg_image_transport.
-RUN if [[ ${PLATFORM} == "arm64" ]]; then \
-        sudo apt update && \
+RUN sudo apt update && \
+    \
+    # On arm64 we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
+    if [[ ${PLATFORM} == "arm64" ]]; then \
         mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         # Install ffmpeg.
         git clone -b "master" --depth 1 "https://github.com/berndpfrommer/jetson-ffmpeg.git" && \
@@ -128,49 +130,36 @@ RUN if [[ ${PLATFORM} == "arm64" ]]; then \
         make -j$(nproc) && \
         sudo make install && \
         sudo ldconfig && \
-        sudo rm -rf "${HOME}/dependencies" && \
-        # Install ffmpeg_image_transport.
-        mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
-        git clone -b "2.0.3" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
-        cd ".." && \
-        vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
-        source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-        rosdep update && sudo rosdep install -y --from-paths "." --ignore-src --rosdistro="${ROS_DISTRO}" && \
-        cd "src" && \
-        \
-        for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
-            cd "${package}" && \
-            # Generate debian files.
-            bloom-generate rosdebian && \
-            # Disable building tests and treat deprecation warnings as non-fatal.
-            sed -i 's/dh_auto_configure --/dh_auto_configure -- -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations"/g' "debian/rules" && \
-            # Use all cores for building.
-            sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
-            # Ignore missing info for shlibdeps.
-            sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' "debian/rules" && \
-            # Build the package.
-            fakeroot "debian/rules" binary && \
-            # Install the package.
-            cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
-        done && \
-        \
-        rm -rf "${HOME}/dependencies" && \
-        sudo rm -rf "${HOME}/.ros/rosdep/"* && \
-        sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*; \
-    else \
-        sudo apt update && sudo apt install -y --no-install-recommends \
-            ros-${ROS_DISTRO}-ffmpeg-image-transport && \
-        sudo apt install --reinstall \
-            ffmpeg \
-            libavcodec58 \
-            libavformat58 \
-            libavutil56 \
-            libswscale5 \
-            libswresample3 \
-            libavfilter7 \
-            libpostproc55 && \
-        sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*; \
-    fi
+        sudo rm -rf "${HOME}/dependencies"; \
+    fi; \ 
+    \
+    mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
+    git clone -b "3.0.0" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
+    cd ".." && \
+    vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
+    source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
+    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src --rosdistro="${ROS_DISTRO}" && \
+    cd "src" && \
+    \
+    for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
+        cd "${package}" && \
+        # Generate debian files.
+        bloom-generate rosdebian && \
+        # Disable building tests and treat deprecation warnings as non-fatal.
+        sed -i 's/dh_auto_configure --/dh_auto_configure -- -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations"/g' "debian/rules" && \
+        # Use all cores for building.
+        sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
+        # Ignore missing info for shlibdeps.
+        sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' "debian/rules" && \
+        # Build the package.
+        fakeroot "debian/rules" binary && \
+        # Install the package.
+        cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
+    done; \
+    \
+    rm -rf "${HOME}/dependencies" && \
+    sudo rm -rf "${HOME}/.ros/rosdep/"* && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*
 
 # Install a backport of jazzy's compressed_depth_image_transport to make RVL compression available.
 RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
@@ -191,7 +180,7 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         fakeroot "debian/rules" binary && \
         # Install the package.
         cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
-    done && \
+    done; \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"*
