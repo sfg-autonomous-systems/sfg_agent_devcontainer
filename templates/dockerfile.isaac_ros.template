@@ -144,7 +144,7 @@ RUN sudo apt update && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src --rosdistro="${ROS_DISTRO}" && \
+    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
