@@ -77,24 +77,25 @@
             },
             "extensions": [
                 // General extensions.
-                "ms-azuretools.vscode-docker",
+                "augustocdias.tasks-shell-input",
                 "eamodio.gitlens",
-                "GitHub.copilot",
                 "foxundermoon.shell-format",
-                "timonwong.shellcheck",
+                "GitHub.copilot",
+                "ms-azuretools.vscode-docker",
+                "Ranch-Hand-Robotics.rde-pack",
                 "redhat.vscode-xml",
                 "redhat.vscode-yaml",
-                "Ranch-Hand-Robotics.rde-pack",
+                "timonwong.shellcheck",
                 // Python extensions.
-                "njpwerner.autodocstring",
-                "ms-python.python",
                 "charliermarsh.ruff",
                 "ms-python.mypy-type-checker",
+                "ms-python.python",
+                "njpwerner.autodocstring",
                 // C++ extensions.
-                "ms-vscode.cpptools-extension-pack",
+                "cschlosser.doxdocgen",
                 "jeff-hykin.better-cpp-syntax",
                 "josetr.cmake-language-support-vscode",
-                "cschlosser.doxdocgen"
+                "ms-vscode.cpptools-extension-pack"
             ]
         }
     }

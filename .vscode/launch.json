@@ -1,0 +1,71 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug ROS2 C++ Node",
+            "type": "cppdbg",
+            "request": "launch",
+            // We use bash to launch the node because that's the only way I managed to also forward
+            // the user's command line arguments they enter via the prompt.
+            "program": "/bin/bash",
+            "args": [
+                "-c",
+                // For some reason we need to source the ROS setup file in the same command as we launch the node.
+                // Perhaps we also need to source the workspace setup file here as well?
+                "source \"/opt/ros/${ROS_DISTRO}/setup.bash\"; \"${input:cppNodePath}\" ${input:args}"
+            ],
+            // In order for GDB to find the source files breakpoints are set in, we need to set the CWD appropriately.
+            "cwd": "${env:REPOSITORY_DIRECTORY}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            // Stop at entry doesn't work/make sense because aren't directly running the node executable, we
+            // are running it via bash.
+            "stopAtEntry": false,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Colcon: build (debug)",
+        },
+        {
+            "name": "Debug ROS2 Python Node",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${input:pythonNodePath}",
+            "args": "${input:args}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ],
+    "inputs": [
+        {
+            "id": "cppNodePath",
+            "type": "command",
+            // shellCommand.execute requires the extension "augustocdias.tasks-shell-input".
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "${workspaceFolder}/.vscode/scripts/list_ros2_nodes cpp",
+                "description": "Select ROS 2 executable",
+                "fieldSeparator": "|",
+            }
+        },
+        {
+            "id": "pythonNodePath",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "${workspaceFolder}/.vscode/scripts/list_ros2_nodes python",
+                "description": "Select ROS 2 executable",
+                "fieldSeparator": "|",
+            }
+        },
+        {
+            "id": "args",
+            "type": "promptString",
+            "description": "Enter node arguments"
+        }
+    ]
+}
