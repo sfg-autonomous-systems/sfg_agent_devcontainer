@@ -11,7 +11,7 @@ sfg_isaac_ros_devcontainer__instantiate_isaac_ros_dockerfile_template() {
     local END_TEXT="< Done instantiating Isaac ROS dockerfile template."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../resources/dockerfile.isaac_ros.template"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../templates/dockerfile.isaac_ros.template"
     local dockerfile_user="${devcontainer_user_directory}/dockerfile.user"
     local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.isaac_ros"
 

@@ -12,7 +12,7 @@ sfg_isaac_ros_devcontainer__configure_project_as_service() {
     local END_TEXT="< Done configuring project as service."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local SERVICE_TEMPLATE="${SCRIPT_DIR}/../resources/service.template"
+    local SERVICE_TEMPLATE="${SCRIPT_DIR}/../templates/service.template"
     local service_filename
     service_filename="$(sfg_isaac_ros_devcontainer__get_project_name).service"
     local service_filepath="${HOME}/.config/systemd/user/${service_filename}"

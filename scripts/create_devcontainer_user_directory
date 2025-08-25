@@ -20,11 +20,11 @@ sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
 
     mkdir -p "${DEVCONTAINER_USER_DIRECTORY}"
     # shellcheck disable=SC2016
-    PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/compose.user.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.user.yaml"
+    PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../templates/compose.user.yaml.template" >"${DEVCONTAINER_USER_DIRECTORY}/compose.user.yaml"
     # shellcheck disable=SC2016
-    PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../resources/dockerfile.user.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile.user"
-    cp "${SCRIPT_DIR}/../resources/user_initialize_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
-    cp "${SCRIPT_DIR}/../resources/user_post_start_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
+    PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../templates/dockerfile.user.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile.user"
+    cp "${SCRIPT_DIR}/../templates/user_initialize_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
+    cp "${SCRIPT_DIR}/../templates/user_post_start_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
     sfg_bash_utils__print_info "${END_TEXT}"
 }

@@ -37,6 +37,7 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         iperf3 \
         bmon \
         usbutils \
+        gdb \
         dotnet-sdk-6.0 && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
@@ -52,8 +53,14 @@ ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 WORKDIR /
 
 RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
+    # Apply general patches.
+    for PATCH in "/tmp/patches/"*".patch"; do \
+        # Check if the patch file actually exists (glob might return the pattern if no files match
+        [ -f "${PATCH}" ] || continue; \
+        patch -p1 --forward <"${PATCH}"; \
+    done && \
+    # Apply platform specific patches.
     for PATCH in "/tmp/patches/${PLATFORM}/"*".patch"; do \
-        # Check if the patch file actually exists (glob might return the pattern if no files match).
         [ -f "${PATCH}" ] || continue; \
         patch -p1 --forward <"${PATCH}"; \
     done
@@ -112,7 +119,6 @@ COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSP
 
 # Install ffmpeg_image_transport.
 RUN sudo apt update && \
-    \
     # On arm64 we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
     if [[ ${PLATFORM} == "arm64" ]]; then \
         mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
@@ -134,7 +140,7 @@ RUN sudo apt update && \
     fi; \ 
     \
     mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
-    git clone -b "3.0.0" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
+    git clone -b "3.0.2" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
@@ -156,6 +162,18 @@ RUN sudo apt update && \
         # Install the package.
         cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
     done; \
+    \
+    if [[ ${PLATFORM} == "amd64" ]]; then \
+        sudo apt install -y --no-install-recommends --reinstall \
+            ffmpeg \
+            libavcodec58 \
+            libavformat58 \
+            libavutil56 \
+            libswscale5 \
+            libswresample3 \
+            libavfilter7 \
+            libpostproc55; \
+    fi; \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"* && \
@@ -195,7 +213,7 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     colcon mixin update default && \
     echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" | sudo tee -a "/etc/bash.bashrc"
 
-COPY ".devcontainer/resources/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
+COPY ".devcontainer/config/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
 
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
