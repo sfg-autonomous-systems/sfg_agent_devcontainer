@@ -21,9 +21,12 @@ sfg_isaac_ros_devcontainer__build_isaac_ros_base_image() {
         ;;
     esac
 
+    # Build the Isaac ROS base image but ignore errors because (1) because if we do not have
+    # an internet connection the build will fail and (2) any failure to build the base image
+    # will be caught later when we try to build the actual user image.
     "${SCRIPT_DIR}/../dependencies/isaac_ros_common/scripts/build_image_layers.sh" \
         --image_key "${platform}.ros2_humble" \
-        --image_name "isaac-ros-base"
+        --image_name "isaac-ros-base" || true
 
     sfg_bash_utils__print_info "${END_TEXT}"
 }
