@@ -79,7 +79,7 @@
                 // General extensions.
                 "augustocdias.tasks-shell-input",
                 "eamodio.gitlens",
-                "foxundermoon.shell-format",
+                "foxundermoon.shell-format@7.2.5",
                 "GitHub.copilot",
                 "ms-azuretools.vscode-docker",
                 "Ranch-Hand-Robotics.rde-pack",
