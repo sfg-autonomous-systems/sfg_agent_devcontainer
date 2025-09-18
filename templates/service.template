@@ -1,19 +1,18 @@
 [Unit]
 Description=Service to auto start software stack for ${PROJECT_NAME} on system boot.
 After=docker.service
-StartLimitBurst=5
-StartLimitIntervalSec=120s
 
 [Service]
+Type=oneshot
+RemainAfterExit=yes
 WorkingDirectory=${WORKING_DIRECTORY}
 # Wait for internet connection to be established.
 ExecStartPre="/usr/bin/nm-online"
 # Wait for time to be synced.
-ExecStartPre="/bin/sh" -c 'until timedatectl status | grep -q "System clock synchronized: yes"; do sleep 1; done'
-ExecStart="/usr/bin/docker" compose -f "compose.user.yaml" up --abort-on-container-failure
-ExecStop="/usr/bin/docker" compose down
-Restart=on-failure
-RestartSec=10s
+ExecStartPre="/bin/bash" -c "until timedatectl status | grep -q \"System clock synchronized: yes\"; do sleep 1; done"
+ExecStartPre="/bin/bash" -c "echo \"PROJECT_NAME=${PROJECT_NAME}\" >\".env\""
+ExecStart="/bin/bash" -c "\"/usr/bin/docker\" compose -f \"compose.user.yaml\" up -d"
+ExecStop="/bin/bash" -c  "\"/usr/bin/docker\" compose -f \"compose.user.yaml\" stop"
 TimeoutStartSec=infinity
 
 [Install]

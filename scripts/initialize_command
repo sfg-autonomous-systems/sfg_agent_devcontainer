@@ -29,8 +29,6 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     done
 
     local ENVIRONMENT_FILE="${SCRIPT_DIR}/../compose/.env"
-    local DEVCONTAINER_USER_DIRECTORY
-    DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
 
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
     sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
@@ -40,9 +38,13 @@ sfg_isaac_ros_devcontainer__initialize_command() {
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
 
+    local DEVCONTAINER_USER_DIRECTORY
+    DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
+    local USER_ENIVORNMENT_FILE="${DEVCONTAINER_USER_DIRECTORY}/.env"
+
     sfg_isaac_ros_devcontainer__stop_project_service
     sfg_isaac_ros_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
-    sfg_isaac_ros_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
+    sfg_isaac_ros_devcontainer__forward_project_name "${USER_ENIVORNMENT_FILE}"
     sfg_isaac_ros_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_isaac_ros_devcontainer__copy_dependencies
     sfg_isaac_ros_devcontainer__configure_firewall
