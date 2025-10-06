@@ -9,8 +9,8 @@ sfg_agent_devcontainer__initialize_command() {
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/get_project_name"
 
-    local START_TEXT="> Invoking initialize command for Isaac ROS devcontainer."
-    local END_TEXT="< Done invoking initialize command for Isaac ROS devcontainer."
+    local START_TEXT="> Invoking initialize command for agent devcontainer."
+    local END_TEXT="< Done invoking initialize command for agent devcontainer."
 
     sfg_bash_utils__print_info "${START_TEXT}"
 
