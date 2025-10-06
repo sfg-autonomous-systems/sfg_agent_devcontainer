@@ -122,6 +122,19 @@ COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSP
 
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
+    sudo apt update && sudo apt install -y --no-install-recommends \
+        ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-xacro \
+        python3-colcon-mixin && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    \
+    colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
+    colcon mixin update default && \
+    echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" | sudo tee -a "/etc/bash.bashrc"
+
+COPY ".devcontainer/config/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
+
 # Install ffmpeg_image_transport.
 RUN sudo apt update && \
     # On arm64 we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
@@ -159,7 +172,7 @@ RUN sudo apt update && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src && \
+    rosdep update && sudo -E rosdep install -y --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
@@ -205,19 +218,6 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"*
-
-RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    sudo apt update && sudo apt install -y --no-install-recommends \
-        ros-${ROS_DISTRO}-magic-enum \
-        ros-${ROS_DISTRO}-xacro \
-        python3-colcon-mixin && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
-    \
-    colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
-    colcon mixin update default && \
-    echo "[ -f ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash ] && source ${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws/install/setup.bash" | sudo tee -a "/etc/bash.bashrc"
-
-COPY ".devcontainer/config/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
 
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
