@@ -141,14 +141,24 @@ RUN sudo apt update && \
         sudo make install && \
         sudo ldconfig && \
         sudo rm -rf "${HOME}/dependencies"; \
-    fi; \ 
+    else \
+        sudo apt install -y --no-install-recommends \
+            ffmpeg \
+            libavcodec58 \
+            libavformat58 \
+            libavutil56 \
+            libswscale5 \
+            libswresample3 \
+            libavfilter7 \
+            libpostproc55; \
+    fi; \
     \
     mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
     git clone -b "3.0.2" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src && \
+    rosdep update && sudo rosdep install -y -r --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
@@ -166,18 +176,6 @@ RUN sudo apt update && \
         # Install the package.
         cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
     done; \
-    \
-    if [[ ${PLATFORM} == "amd64" ]]; then \
-        sudo apt install -y --no-install-recommends --reinstall \
-            ffmpeg \
-            libavcodec58 \
-            libavformat58 \
-            libavutil56 \
-            libswscale5 \
-            libswresample3 \
-            libavfilter7 \
-            libpostproc55; \
-    fi; \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"* && \
