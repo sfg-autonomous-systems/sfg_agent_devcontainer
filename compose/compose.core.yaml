@@ -1,8 +1,8 @@
 services:
-  isaac_ros:
+  sfg_agent_devcontainer:
     build:
       context: "../.."
-      dockerfile: ".devcontainer/docker/dockerfile.isaac_ros"
+      dockerfile: ".devcontainer/docker/dockerfile.core"
       args:
         - PLATFORM=${PLATFORM}
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}

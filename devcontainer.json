@@ -1,7 +1,7 @@
 {
-    "name": "Isaac ROS",
+    "name": "SFG Agent",
     "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer_user/compose.user.yaml",
-    "service": "isaac_ros",
+    "service": "sfg_agent_devcontainer",
     "overrideCommand": true,
     "workspaceFolder": "/workspaces",
     "initializeCommand": [

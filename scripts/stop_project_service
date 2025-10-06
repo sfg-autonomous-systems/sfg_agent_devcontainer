@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-sfg_isaac_ros_devcontainer__stop_project_service() {
+sfg_agent_devcontainer__stop_project_service() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/get_project_name"
 
     local service_name
-    service_name="$(sfg_isaac_ros_devcontainer__get_project_name)"
+    service_name="$(sfg_agent_devcontainer__get_project_name)"
 
     local START_TEXT="> Stopping service ${service_name}."
     local END_TEXT="< Done stopping service ${service_name}."
@@ -21,5 +21,5 @@ sfg_isaac_ros_devcontainer__stop_project_service() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_isaac_ros_devcontainer__stop_project_service "${@}"
+    sfg_agent_devcontainer__stop_project_service "${@}"
 fi

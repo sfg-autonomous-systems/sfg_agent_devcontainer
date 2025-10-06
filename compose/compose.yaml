@@ -1,4 +1,4 @@
 include:
   - path:
-      - "./compose.isaac_ros.base.yaml"
-      - "./compose.isaac_ros.${PLATFORM}.yaml"
+      - "./compose.core.yaml"
+      - "./compose.core.${PLATFORM}.yaml"

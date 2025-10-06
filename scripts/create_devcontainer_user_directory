@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
+sfg_agent_devcontainer__create_devcontainer_user_directory() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
@@ -22,7 +22,7 @@ sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
     echo ".env" >"${DEVCONTAINER_USER_DIRECTORY}/.gitignore"
     cp "${SCRIPT_DIR}/../compose/compose.user.yaml" "${DEVCONTAINER_USER_DIRECTORY}/compose.user.yaml"
     # shellcheck disable=SC2016
-    PROJECT_NAME="$(sfg_isaac_ros_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../templates/dockerfile.user.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile.user"
+    PROJECT_NAME="$(sfg_agent_devcontainer__get_project_name)" envsubst '${PROJECT_NAME}' <"${SCRIPT_DIR}/../templates/dockerfile.user.template" >"${DEVCONTAINER_USER_DIRECTORY}/dockerfile.user"
     cp "${SCRIPT_DIR}/../templates/user_initialize_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_initialize_command"
     cp "${SCRIPT_DIR}/../templates/user_post_start_command.template" "${DEVCONTAINER_USER_DIRECTORY}/user_post_start_command"
     chmod +x "${DEVCONTAINER_USER_DIRECTORY}/user_"*
@@ -31,5 +31,5 @@ sfg_isaac_ros_devcontainer__create_devcontainer_user_directory() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_isaac_ros_devcontainer__create_devcontainer_user_directory "${@}"
+    sfg_agent_devcontainer__create_devcontainer_user_directory "${@}"
 fi

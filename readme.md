@@ -1,4 +1,4 @@
-# Isaac ROS Dev Container
+# Agent Dev Container
 
 In order to integrate this dev container into your project follow the steps below:
 
@@ -6,8 +6,8 @@ In order to integrate this dev container into your project follow the steps belo
 
     | Protocol | Command                                                                                                                                   |
     |:--------:|-------------------------------------------------------------------------------------------------------------------------------------------|
-    | HTTPS    | `git submodule add https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/isaac-ros-dev-container.git .devcontainer` |
-    | SSH      | `git submodule add git@gitlab.hs-esslingen.de:smart-factory-grids/autonomous-systems/tools/isaac-ros-dev-container.git .devcontainer`     |
+    | HTTPS    | `git submodule add https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/agent-dev-container.git .devcontainer` |
+    | SSH      | `git submodule add git@gitlab.hs-esslingen.de:smart-factory-grids/autonomous-systems/tools/agent-dev-container.git .devcontainer`     |
 
 2. Execute `.devcontainer/scripts/create_devcontainer_user_directory` to create the integration files required at the root of your project.
 
@@ -15,7 +15,7 @@ In order to integrate this dev container into your project follow the steps belo
     ```
     .
     ├── .devcontainer                       # This repository as a git submodule.
-    ├── .devcontainer_user/                 # User configuration to customize the Isaac ROS dev container.
+    ├── .devcontainer_user/                 # User configuration to customize the agent dev container.
     │   ├── compose.user.yaml
     │   ├── dockerfile.user
     │   ├── user_initialize_command

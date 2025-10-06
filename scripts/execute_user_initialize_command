@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-sfg_isaac_ros_devcontainer__execute_user_initialize_command() {
+sfg_agent_devcontainer__execute_user_initialize_command() {
     local devcontainer_user_directory="${1}"
 
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
-    
+
     local user_initialize_command="${devcontainer_user_directory}/user_initialize_command"
 
     local START_TEXT="> Executing user initialize command '${user_initialize_command}'."
@@ -21,5 +21,5 @@ sfg_isaac_ros_devcontainer__execute_user_initialize_command() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_isaac_ros_devcontainer__execute_user_initialize_command "${@}"
+    sfg_agent_devcontainer__execute_user_initialize_command "${@}"
 fi

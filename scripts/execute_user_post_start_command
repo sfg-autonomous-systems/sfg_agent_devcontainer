@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sfg_isaac_ros_devcontainer__execute_user_post_start_command() {
+sfg_agent_devcontainer__execute_user_post_start_command() {
     local devcontainer_user_directory="${1}"
 
     local SCRIPT_DIR
@@ -20,5 +20,5 @@ sfg_isaac_ros_devcontainer__execute_user_post_start_command() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_isaac_ros_devcontainer__execute_user_post_start_command "${@}"
+    sfg_agent_devcontainer__execute_user_post_start_command "${@}"
 fi

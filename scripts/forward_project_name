@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sfg_isaac_ros_devcontainer__forward_project_name() {
+sfg_agent_devcontainer__forward_project_name() {
     local environment_file="${1}"
 
     local SCRIPT_DIR
@@ -12,11 +12,11 @@ sfg_isaac_ros_devcontainer__forward_project_name() {
     local END_TEXT="< Done forwarding project name."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    sfg_bash_utils__set_environment_variable "${environment_file}" "PROJECT_NAME" "$(sfg_isaac_ros_devcontainer__get_project_name)-devcontainer"
+    sfg_bash_utils__set_environment_variable "${environment_file}" "PROJECT_NAME" "$(sfg_agent_devcontainer__get_project_name)-devcontainer"
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_isaac_ros_devcontainer__forward_project_name "${@}"
+    sfg_agent_devcontainer__forward_project_name "${@}"
 fi

@@ -1,4 +1,4 @@
 services:
-  isaac_ros:
+  sfg_agent_devcontainer:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all

@@ -1,5 +1,5 @@
 services:
-  isaac_ros:
+  sfg_agent_devcontainer:
     volumes:
       - type: bind
         source: /usr/bin/tegrastats
