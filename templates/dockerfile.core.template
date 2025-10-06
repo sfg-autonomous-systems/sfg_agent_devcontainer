@@ -46,7 +46,12 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
 
 RUN pip install --upgrade \
         pybind11[global] \
-        pybind11-stubgen 
+        pybind11-stubgen && \
+        \
+        if [[ ${PLATFORM} == "arm64" ]]; then \
+            pip install \ 
+                jetson-stats; \
+        fi
 
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
