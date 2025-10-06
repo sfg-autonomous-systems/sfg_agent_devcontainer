@@ -48,8 +48,6 @@ RUN pip install --upgrade \
         pybind11[global] \
         pybind11-stubgen 
 
-ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-
 #########################################################################################################
 # Apply patches.                                                                                        #
 #########################################################################################################
@@ -104,14 +102,14 @@ USER ${USERNAME}
 # Set our working directory.
 WORKDIR ${CONTAINER_WORKSPACE_DIRECTORY}
 # Ensure we can read/write to the working directory.
-RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
-    # Fix for empty .bashrc and non-existing .profile when using amd64 base image.
-    [[ ${PLATFORM} == "amd64" ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
+RUN sudo chown "${USERNAME}":"${USERNAME}" "."
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
 #########################################################################################################
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
+
+ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 
 # Install ffmpeg_image_transport.
 RUN sudo apt update && \
@@ -202,6 +200,7 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
         ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-xacro \
         python3-colcon-mixin && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     \
