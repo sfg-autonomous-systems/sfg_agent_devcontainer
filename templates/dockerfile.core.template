@@ -31,6 +31,7 @@ USER root
 #########################################################################################################
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     apt update && apt install -y --no-install-recommends \
+        git-lfs\
         net-tools \
         nano \
         iproute2 \
