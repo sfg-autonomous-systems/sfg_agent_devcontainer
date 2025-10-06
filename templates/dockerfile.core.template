@@ -91,7 +91,7 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
     else \
         CONFLICTING_GROUPNAME=`getent group "${USER_GID}" | cut -d: -f1` && \
         groupmod -o --gid "${USER_GID}" -n "${USERNAME}" "${CONFLICTING_GROUPNAME}"; \
-    fi; \
+    fi && \
     \
     if [ ! $(getent passwd "${USER_UID}") ]; then \
         useradd --no-log-init --uid "${USER_UID}" --gid "${USER_GID}" -m "${USERNAME}" &>"/dev/null"; \
@@ -101,12 +101,12 @@ RUN if [ ! $(getent group "${USER_GID}") ]; then \
         mkdir -p "/home/${USERNAME}" && \
         # Wipe files that may create issues for users with large UID numbers.
         rm -f "/var/log/lastlog /var/log/faillog"; \
-    fi; \
+    fi && \
     \
     chown "${USERNAME}":"${USERNAME}" "/home/${USERNAME}" && \
     echo "${USERNAME}" ALL=\(root\) NOPASSWD:ALL >"/etc/sudoers.d/${USERNAME}" && \
     chmod 0440 "/etc/sudoers.d/${USERNAME}" && \
-    usermod -aG video,plugdev,sudo "${USERNAME}";
+    usermod -aG video,plugdev,sudo "${USERNAME}"
 
 # Activate the previously created user.
 USER ${USERNAME}
@@ -152,14 +152,14 @@ RUN sudo apt update && \
             libswresample3 \
             libavfilter7 \
             libpostproc55; \
-    fi; \
+    fi && \
     \
     mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
     git clone -b "3.0.2" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && sudo rosdep install -y -r --from-paths "." --ignore-src && \
+    rosdep update && sudo rosdep install -y --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
@@ -176,7 +176,7 @@ RUN sudo apt update && \
         fakeroot "debian/rules" binary && \
         # Install the package.
         cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
-    done; \
+    done && \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"* && \
@@ -201,7 +201,7 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         fakeroot "debian/rules" binary && \
         # Install the package.
         cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
-    done; \
+    done && \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"*
