@@ -7,6 +7,7 @@ sfg_agent_devcontainer__initialize_command() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
+    source "${SCRIPT_DIR}/bash_utils/get_platform"
     source "${SCRIPT_DIR}/get_project_name"
 
     local START_TEXT="> Invoking initialize command for agent devcontainer."
@@ -28,7 +29,9 @@ sfg_agent_devcontainer__initialize_command() {
         source "${script}"
     done
 
-    local ENVIRONMENT_FILE="${SCRIPT_DIR}/../compose/.env"
+    local DEVCONTAINER_USER_DIRECTORY
+    DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
+    local ENVIRONMENT_FILE="${DEVCONTAINER_USER_DIRECTORY}/.env"
 
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
     sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
@@ -38,17 +41,18 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
 
-    local DEVCONTAINER_USER_DIRECTORY
-    DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
-    local USER_ENVIRONMENT_FILE="${DEVCONTAINER_USER_DIRECTORY}/.env"
-
     sfg_agent_devcontainer__stop_project_service
     sfg_agent_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
-    sfg_agent_devcontainer__forward_project_name "${USER_ENVIRONMENT_FILE}"
+    sfg_agent_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__copy_dependencies
     sfg_agent_devcontainer__configure_firewall
     sfg_agent_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${@}"
+
+    if [[ $(sfg_bash_utils__get_platform) == "nvidia"* ]]; then
+        sfg_isaac_ros_devcontainer__build_isaac_ros_image
+    fi
+
     sfg_agent_devcontainer__instantiate_core_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_bash_utils__print_info "${END_TEXT}"
 }

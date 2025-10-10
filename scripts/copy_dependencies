@@ -4,6 +4,7 @@ sfg_agent_devcontainer__copy_dependencies() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
+    source "${SCRIPT_DIR}/bash_utils/get_platform"
 
     local START_TEXT="> Copying dependencies on host system into the docker build context."
     local END_TEXT="< Done copying dependencies on host system into the docker build context."
@@ -11,10 +12,8 @@ sfg_agent_devcontainer__copy_dependencies() {
     sfg_bash_utils__print_info "${START_TEXT}"
     local dependencies=()
 
-    case $(uname -m) in
-    "x86_64") ;;
-
-    "aarch64" | "arm64")
+    case $(sfg_bash_utils__get_platform) in
+    "jetson")
         dependencies+=(
             "/usr/src/jetson_multimedia_api"
             "$(realpath /usr/lib/aarch64-linux-gnu/tegra)"

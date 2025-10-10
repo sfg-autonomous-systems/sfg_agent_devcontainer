@@ -1,4 +1,5 @@
 services:
   sfg_agent_devcontainer:
     environment:
+      - NVIDIA_DRIVER_CAPABILITIES=all
       - NVIDIA_VISIBLE_DEVICES=all

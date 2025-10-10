@@ -32,8 +32,6 @@ services:
     environment:
       - DISPLAY
       - TERM=${TERM:-xterm}
-      - NVIDIA_DRIVER_CAPABILITIES=all
     network_mode: host
     privileged: true
     ipc: host
-    runtime: nvidia

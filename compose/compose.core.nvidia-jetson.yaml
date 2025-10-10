@@ -18,6 +18,8 @@ services:
         target: /run/jtop.sock
         read_only: true
     environment:
+      - NVIDIA_DRIVER_CAPABILITIES=all
       - NVIDIA_VISIBLE_DEVICES=nvidia.com/gpu=all,nvidia.com/pva=all
     group_add:
       - ${LOCAL_JTOP_GID}
+    runtime: nvidia
