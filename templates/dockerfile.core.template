@@ -102,7 +102,18 @@ USER ${USERNAME}
 # Set our working directory.
 WORKDIR ${CONTAINER_WORKSPACE_DIRECTORY}
 # Ensure we can read/write to the working directory.
-RUN sudo chown "${USERNAME}":"${USERNAME}" "."
+RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
+    # Fix for empty .bashrc and non-existing .profile when on nvidia platform.
+    [[ ${PLATFORM} == "nvidia" ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
+
+#########################################################################################################
+# Setup Isaac ROS apt legacy repository when on nvidia platform.                                        #
+#########################################################################################################
+RUN if [[ ${PLATFORM} == "nvidia"* ]]; then \
+        wget -qO - "https://isaac.download.nvidia.com/isaac-ros/repos.key" | sudo apt-key add - && \
+        grep -qxF "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" "/etc/apt/sources.list" || \
+        echo "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" | sudo tee -a "/etc/apt/sources.list"; \
+    fi
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
