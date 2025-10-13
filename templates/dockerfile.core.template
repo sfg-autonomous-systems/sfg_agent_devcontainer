@@ -1,4 +1,3 @@
-
 ARG PLATFORM
 
 FROM isaac-ros AS sfg-agent-devcontainer-nvidia-jetson

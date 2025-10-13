@@ -4,15 +4,19 @@ services:
       - type: bind
         source: /usr/bin/tegrastats
         target: /usr/bin/tegrastats
+        read_only: true
       - type: bind
         source: /usr/lib/aarch64-linux-gnu/tegra
         target: /usr/lib/aarch64-linux-gnu/tegra
+        read_only: true
       - type: bind
         source: /usr/src/jetson_multimedia_api
         target: /usr/src/jetson_multimedia_api
+        read_only: true
       - type: bind
         source: /usr/share/vpi3
         target: /usr/share/vpi3
+        read_only: true
       - type: bind
         source: /run/jtop.sock
         target: /run/jtop.sock
