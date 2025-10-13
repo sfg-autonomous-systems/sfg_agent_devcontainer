@@ -49,6 +49,15 @@ RUN pip install --upgrade \
         pybind11-stubgen
 
 #########################################################################################################
+# Setup Isaac ROS apt legacy repository when on nvidia platform.                                        #
+#########################################################################################################
+RUN if [[ ${PLATFORM} == "nvidia"* ]]; then \
+        wget -qO - "https://isaac.download.nvidia.com/isaac-ros/repos.key" | sudo apt-key add - && \
+        grep -qxF "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" "/etc/apt/sources.list" || \
+        echo "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" | sudo tee -a "/etc/apt/sources.list"; \
+    fi
+
+#########################################################################################################
 # Apply patches.                                                                                        #
 #########################################################################################################
 WORKDIR /
@@ -56,7 +65,7 @@ WORKDIR /
 RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
     # Apply general patches.
     for PATCH in "/tmp/patches/"*".patch"; do \
-        # Check if the patch file actually exists (glob might return the pattern if no files match
+        # Check if the patch file actually exists (glob might return the pattern if no files match).
         [ -f "${PATCH}" ] || continue; \
         patch -p1 --forward <"${PATCH}"; \
     done && \
@@ -105,15 +114,6 @@ WORKDIR ${CONTAINER_WORKSPACE_DIRECTORY}
 RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
     # Fix for empty .bashrc and non-existing .profile when on nvidia platform.
     [[ ${PLATFORM} == "nvidia" ]] && cat "/etc/skel/.bashrc" >>"/home/${USERNAME}/.bashrc" && cat "/etc/skel/.profile" >>"/home/${USERNAME}/.profile" || true
-
-#########################################################################################################
-# Setup Isaac ROS apt legacy repository when on nvidia platform.                                        #
-#########################################################################################################
-RUN if [[ ${PLATFORM} == "nvidia"* ]]; then \
-        wget -qO - "https://isaac.download.nvidia.com/isaac-ros/repos.key" | sudo apt-key add - && \
-        grep -qxF "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" "/etc/apt/sources.list" || \
-        echo "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" | sudo tee -a "/etc/apt/sources.list"; \
-    fi
 
 #########################################################################################################
 # Setup ROS2.                                                                                           #
