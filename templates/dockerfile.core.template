@@ -1,9 +1,6 @@
 ARG PLATFORM
 
 FROM isaac-ros AS sfg-agent-devcontainer-nvidia-jetson
-COPY ".devcontainer/dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
-COPY ".devcontainer/dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
-
 FROM isaac-ros AS sfg-agent-devcontainer-nvidia
 FROM ros:humble-perception-jammy AS sfg-agent-devcontainer-amd
 FROM ros:humble-perception-jammy AS sfg-agent-devcontainer-generic
