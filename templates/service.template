@@ -7,12 +7,12 @@ Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=${WORKING_DIRECTORY}
 # Wait for internet connection to be established.
-ExecStartPre="/usr/bin/nm-online"
+ExecStartPre=/usr/bin/nm-online
 # Wait for time to be synced.
-ExecStartPre="/bin/bash" -c "until timedatectl status | grep -q \"System clock synchronized: yes\"; do sleep 1; done"
-ExecStartPre="/bin/bash" -c "echo \"PROJECT_NAME=${PROJECT_NAME}\" >\".env\""
-ExecStart="/bin/bash" -c "\"/usr/bin/docker\" compose -f \"compose.user.yaml\" up -d"
-ExecStop="/bin/bash" -c  "\"/usr/bin/docker\" compose -f \"compose.user.yaml\" stop"
+ExecStartPre=/bin/bash -c "until timedatectl status | grep -q 'System clock synchronized: yes'; do sleep 1; done"
+ExecStartPre=/bin/bash -c "source '../.devcontainer/scripts/bash_utils/env_file_utils'; sfg_bash_utils__set_environment_variable '.env' 'PROJECT_NAME' '${PROJECT_NAME}'"
+ExecStart=/bin/bash -c "'/usr/bin/docker' compose -f 'compose.user.yaml' up -d"
+ExecStop=/bin/bash -c  "'/usr/bin/docker' compose -f 'compose.user.yaml' stop"
 TimeoutStartSec=infinity
 
 [Install]
