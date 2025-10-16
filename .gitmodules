@@ -1,6 +1,6 @@
 [submodule "scripts/bash_utils"]
 	path = scripts/bash_utils
-	url = ../bash-utils.git
+	url = ../../tools/bash-utils.git
 [submodule "dependencies/isaac_ros_common"]
 	path = dependencies/isaac_ros_common
 	url = https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git
