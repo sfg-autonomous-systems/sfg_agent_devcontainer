@@ -3,7 +3,7 @@
     "dockerComposeFile": "${localWorkspaceFolder}/.devcontainer_user/compose.user.yaml",
     "service": "sfg_agent_devcontainer",
     "overrideCommand": true,
-    "workspaceFolder": "/workspaces",
+    "workspaceFolder": "/workspace",
     "initializeCommand": [
         "${localWorkspaceFolder}/.devcontainer/scripts/initialize_command",
         // Local paths.
