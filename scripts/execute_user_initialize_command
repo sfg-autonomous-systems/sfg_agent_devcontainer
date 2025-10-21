@@ -14,7 +14,7 @@ sfg_agent_devcontainer__execute_user_initialize_command() {
 
     if [ -f "${user_initialize_command}" ]; then
         sfg_bash_utils__print_info "${START_TEXT}"
-        "${user_initialize_command}" "${@}"
+        bash "${user_initialize_command}" "${@:2}"
         sfg_bash_utils__print_info "${END_TEXT}"
     fi
 }
