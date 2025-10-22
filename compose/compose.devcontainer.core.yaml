@@ -1,8 +1,8 @@
 services:
   sfg_agent_devcontainer:
     build:
-      context: "../.."
-      dockerfile: ".devcontainer/docker/dockerfile.core"
+      context: ../..
+      dockerfile: .devcontainer/docker/dockerfile.devcontainer
       args:
         - PLATFORM=${PLATFORM}
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
@@ -13,21 +13,21 @@ services:
         - USER_GID=${LOCAL_USER_GID}
     volumes:
       - type: bind
-        source: "../.."
-        target: "${CONTAINER_REPOSITORY_MOUNT_POINT}"
+        source: ../..
+        target: ${CONTAINER_REPOSITORY_MOUNT_POINT}
       - type: bind
-        source: "${LOCAL_SELECTED_DIRECTORY}"
-        target: "${CONTAINER_SELECTED_DIRECTORY_MOUNT_POINT}"
+        source: ${LOCAL_SELECTED_DIRECTORY}
+        target: ${CONTAINER_SELECTED_DIRECTORY_MOUNT_POINT}
       - type: bind
-        source: "/dev"
-        target: "/dev"
+        source: /dev
+        target: /dev
       - type: bind
-        source: "/etc/timezone"
-        target: "/etc/timezone"
+        source: /etc/timezone
+        target: /etc/timezone
         read_only: true
       - type: bind
-        source: "/etc/localtime"
-        target: "/etc/localtime"
+        source: /etc/localtime
+        target: /etc/localtime
         read_only: true
     environment:
       - DISPLAY

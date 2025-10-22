@@ -1,5 +1,8 @@
 services:
   sfg_agent_devcontainer:
+    extends:
+      file: compose.devcontainer.core.yaml
+      service: sfg_agent_devcontainer
     volumes:
       - type: bind
         source: /usr/bin/tegrastats

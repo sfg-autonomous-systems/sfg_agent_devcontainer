@@ -1,5 +1,8 @@
 services:
   sfg_agent_devcontainer:
+    extends:
+      file: compose.devcontainer.core.yaml
+      service: sfg_agent_devcontainer
     environment:
       - NVIDIA_DRIVER_CAPABILITIES=all
       - NVIDIA_VISIBLE_DEVICES=all

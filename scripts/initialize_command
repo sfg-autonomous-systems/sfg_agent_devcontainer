@@ -53,7 +53,7 @@ sfg_agent_devcontainer__initialize_command() {
         sfg_isaac_ros_devcontainer__build_isaac_ros_image
     fi
 
-    sfg_agent_devcontainer__instantiate_core_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
+    sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 

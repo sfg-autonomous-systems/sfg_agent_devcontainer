@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-sfg_agent_devcontainer__instantiate_core_dockerfile_template() {
+sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template() {
     local devcontainer_user_directory="${1}"
 
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
 
-    local START_TEXT="> Instantiating core dockerfile template."
-    local END_TEXT="< Done instantiating core dockerfile template."
+    local START_TEXT="> Instantiating devcontainer dockerfile template."
+    local END_TEXT="< Done instantiating devcontainer dockerfile template."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../templates/dockerfile.core.template"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../templates/dockerfile.devcontainer.template"
     local dockerfile_user="${devcontainer_user_directory}/dockerfile.user"
-    local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.core"
+    local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.devcontainer"
 
     if [ -f "${dockerfile_user}" ]; then
         sed -e "/# :DOCKERFILE_USER:/{r ${dockerfile_user}" -e "d}" "${DOCKERFILE_TEMPLATE}" >"${DOCKERFILE}"
@@ -26,5 +26,5 @@ sfg_agent_devcontainer__instantiate_core_dockerfile_template() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     set -e
-    sfg_agent_devcontainer__instantiate_core_dockerfile_template "${@}"
+    sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${@}"
 fi

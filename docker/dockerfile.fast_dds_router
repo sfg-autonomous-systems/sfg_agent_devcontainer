@@ -1,0 +1,83 @@
+FROM ubuntu:22.04 AS fast_dds_router
+
+# Use bash as shell.
+ENV SHELL=/bin/bash
+SHELL ["/bin/bash", "-c"]
+
+USER root
+
+#########################################################################################################
+# Update and install required apt and pip dependencies.                                                 #
+#########################################################################################################
+RUN --mount=type=cache,id=apt_cache_fast_dds_router,target="/var/cache/apt" \
+    apt update && apt install -y --no-install-recommends \
+        sudo \
+        make \
+        cmake \
+        g++ \
+        python3-pip \
+        wget \
+        git \
+        gettext \
+        inotify-tools \
+        libasio-dev \
+        libtinyxml2-dev \
+        libssl-dev \
+        libyaml-cpp-dev && \
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+
+RUN pip install \
+        vcstool
+
+#########################################################################################################
+# Install Fast DDS Router and its Dependencies.                                                         #
+#########################################################################################################
+ARG DDS_ROUTER_VERSION=v3.2.0
+ENV DDS_ROUTER_VERSION=${DDS_ROUTER_VERSION}
+ARG DDS_ROUTER_DIRECTORY=/opt/DDS-Router
+ENV DDS_ROUTER_DIRECTORY=${DDS_ROUTER_DIRECTORY}
+
+WORKDIR ${DDS_ROUTER_DIRECTORY}
+
+RUN mkdir "src" "build" && \
+    wget "https://raw.githubusercontent.com/eProsima/DDS-Router/${DDS_ROUTER_VERSION}/ddsrouter.repos" && \
+    vcs import "src" < "ddsrouter.repos"
+
+ENV CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
+ENV LD_LIBRARY_PATH=/usr/local/lib/:${LD_LIBRARY_PATH}
+
+# Foonathan Memory Vendor
+RUN mkdir "build/foonathan_memory_vendor" && \
+    cd "build/foonathan_memory_vendor" && \
+    cmake "${DDS_ROUTER_DIRECTORY}/src/foonathan_memory_vendor" \
+        -DCMAKE_INSTALL_PREFIX="/usr/local/" \
+        -DBUILD_SHARED_LIBS=ON && \
+    cmake --build "." --target install -j$(nproc)
+
+# Other projects
+RUN PROJECT_PATHS=" \
+        fastcdr \
+        fastdds \
+        dev-utils/cmake_utils \
+        dev-utils/cpp_utils \
+        ddspipe/ddspipe_core \
+        ddspipe/ddspipe_participants \
+        ddspipe/ddspipe_yaml \
+        ddsrouter/ddsrouter_core \
+        ddsrouter/ddsrouter_yaml \
+        ddsrouter/tools/ddsrouter_tool" && \
+    \
+    for project_path in ${PROJECT_PATHS}; do \
+        project_name=$(basename "${project_path}") && \
+        mkdir -p "build/${project_name}" && \
+        cd "build/${project_name}" && \
+        cmake "${DDS_ROUTER_DIRECTORY}/src/${project_path}" && \
+        cmake --build "." --target install -j$(nproc) && \
+        cd "../.." ; \
+    done
+
+#########################################################################################################
+# Run DDS Router.                                                                                       #
+#########################################################################################################
+CMD envsubst <"/fast_dds_router_config.yaml" >"/tmp/fast_dds_router_config.yaml" && \
+    ddsrouter -c "/tmp/fast_dds_router_config.yaml"

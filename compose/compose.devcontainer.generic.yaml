@@ -1,0 +1,5 @@
+services:
+  sfg_agent_devcontainer:
+    extends:
+      file: compose.devcontainer.core.yaml
+      service: sfg_agent_devcontainer

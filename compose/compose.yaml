@@ -1,4 +1,0 @@
-include:
-  - path:
-      - "./compose.core.yaml"
-      - "./compose.core.${PLATFORM}.yaml"
