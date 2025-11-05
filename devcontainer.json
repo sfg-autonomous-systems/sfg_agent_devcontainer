@@ -53,6 +53,9 @@
                 "shellcheck.customArgs": [
                     "--external-sources"
                 ],
+                "[xml]": {
+                    "editor.indentSize": 2
+                },
                 // Python settings.
                 "python.languageServer": "Pylance",
                 "debugpy.debugJustMyCode": false,
