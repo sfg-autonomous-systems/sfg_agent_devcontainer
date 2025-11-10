@@ -1,7 +1,7 @@
 services:
   sfg_agent_devcontainer:
     extends:
-      file: compose.devcontainer.core.yaml
+      file: compose.devcontainer.generic.yaml
       service: sfg_agent_devcontainer
     volumes:
       - type: bind
