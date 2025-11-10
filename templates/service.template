@@ -10,7 +10,10 @@ WorkingDirectory=${WORKING_DIRECTORY}
 ExecStartPre=/usr/bin/nm-online
 # Wait for time to be synced.
 ExecStartPre=/bin/bash -c "until timedatectl status | grep -q 'System clock synchronized: yes'; do sleep 1; done"
+# Set PROJECT_NAME in the environment file to ensure proper container shutdown when switching between service and devcontainer.
 ExecStartPre=/bin/bash -c "source '../.devcontainer/scripts/bash_utils/env_file_utils'; sfg_bash_utils__set_environment_variable '.env' 'PROJECT_NAME' '${PROJECT_NAME}'"
+# Build the latest images before starting the stack.
+ExecStartPre=-/bin/bash -c "'/usr/bin/docker' compose -f 'compose.user.yaml' build"
 ExecStart=/bin/bash -c "'/usr/bin/docker' compose -f 'compose.user.yaml' up -d"
 ExecStop=/bin/bash -c  "'/usr/bin/docker' compose -f 'compose.user.yaml' stop"
 TimeoutStartSec=infinity
