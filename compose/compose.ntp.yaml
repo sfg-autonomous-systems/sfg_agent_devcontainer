@@ -1,8 +1,0 @@
-services:
-  ntp:
-    image: dockurr/chrony
-    environment:
-      - NTP_SERVERS=${NTP_SERVERS}
-    network_mode: host
-    cap_add:
-      - SYS_TIME
