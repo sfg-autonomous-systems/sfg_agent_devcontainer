@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd "${REPOSITORY_DIRECTORY}/colcon_ws" || exit 1
+cd "${COLCON_WS}" || exit 1
 
 # Node type is either "python" or "cpp".
 node_type="${1}"
@@ -15,11 +15,11 @@ for package in ${packages}; do
         # Filter out executables that do not match the specified node type.
         if [[ "${node_type}" == "python" && "${executable_path}" != *".py" ]]; then
             continue
-        elif [[ "${node_type}" == "cpp"  && "${executable_path}" == *".py" ]]; then
+        elif [[ "${node_type}" == "cpp" && "${executable_path}" == *".py" ]]; then
             continue
         fi
 
         # Returned syntax has to be compatible with the vscode extension "augustocdias.tasks-shell-input".
-        echo "${executable_path}|${package}/$(basename "${executable_path}")||" 
+        echo "${executable_path}|${package}/$(basename "${executable_path}")||"
     done
 done
