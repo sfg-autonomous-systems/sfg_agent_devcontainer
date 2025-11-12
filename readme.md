@@ -6,8 +6,8 @@ In order to integrate this dev container into your project follow the steps belo
 
     | Protocol | Command                                                                                                                                   |
     |:--------:|-------------------------------------------------------------------------------------------------------------------------------------------|
-    | HTTPS    | `git submodule add https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/agent-dev-container.git .devcontainer` |
-    | SSH      | `git submodule add git@gitlab.hs-esslingen.de:smart-factory-grids/autonomous-systems/tools/agent-dev-container.git .devcontainer`     |
+    | HTTPS    | `git submodule add https://gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/agents/agent-devcontainer.git .devcontainer` |
+    | SSH      | `git submodule add git@gitlab.hs-esslingen.de:smart-factory-grids/autonomous-systems/agents/agent-devcontainer.git .devcontainer`     |
 
 2. Execute `.devcontainer/scripts/create_devcontainer_user_directory` to create the integration files required at the root of your project.
 
