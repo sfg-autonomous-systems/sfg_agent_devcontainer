@@ -6,10 +6,14 @@ sfg_agent_devcontainer__post_start_command() {
     source "${SCRIPT_DIR}/bash_utils/common"
     source "${SCRIPT_DIR}/execute_user_post_start_command"
 
+    local START_TEXT="> Invoking post start command for agent devcontainer."
+    local END_TEXT="< Done invoking post start command for agent devcontainer."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
     local DEVCONTAINER_USER_DIRECTORY
     DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
-
     sfg_agent_devcontainer__execute_user_post_start_command "${DEVCONTAINER_USER_DIRECTORY}" "${@}"
+    sfg_bash_utils__print_info "${END_TEXT}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

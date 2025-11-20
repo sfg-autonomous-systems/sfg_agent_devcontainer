@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__post_attach_command() {
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Invoking post attach command for agent devcontainer."
+    local END_TEXT="< Done invoking post attach command for agent devcontainer."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+    current=$(git config --global credential.helper)
+
+    if [[ "${current}" != *"cache"* ]]; then
+        git config --global --unset-all credential.helper
+        git config --global --add credential.helper "cache --timeout=1800"
+        git config --global --add credential.helper "${current}"
+    fi
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__post_attach_command "${@}"
+fi
