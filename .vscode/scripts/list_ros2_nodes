@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-cd "${REPOSITORY_DIRECTORY}/colcon_ws" || exit 1
+cd "${COLCON_WS}" || exit 1
 
 # Node type is either "python" or "cpp".
-node_type="${1}"
+requested_node_type="${1}"
 
 # Get a list of packages defined in this workspace.
 packages=$(colcon list --names-only)
@@ -12,14 +12,19 @@ for package in ${packages}; do
     executable_paths=$(ros2 pkg executables --full-path "${package}" 2>"/dev/null")
 
     for executable_path in ${executable_paths}; do
-        # Filter out executables that do not match the specified node type.
-        if [[ "${node_type}" == "python" && "${executable_path}" != *".py" ]]; then
-            continue
-        elif [[ "${node_type}" == "cpp"  && "${executable_path}" == *".py" ]]; then
+        # Explicitly check if we are dealing with a python node.
+        if file -b "${executable_path}" | grep -q "Python script"; then
+            node_type="python"
+        # Otherwise, assume it is a cpp node.
+        else
+            node_type="cpp"
+        fi
+
+        if [[ "${node_type}" != "${requested_node_type}" ]]; then
             continue
         fi
 
         # Returned syntax has to be compatible with the vscode extension "augustocdias.tasks-shell-input".
-        echo "${executable_path}|${package}/$(basename "${executable_path}")||" 
+        echo "${executable_path}|${package}/$(basename "${executable_path}")||"
     done
 done

@@ -13,7 +13,7 @@
                 "panel": "new"
             },
             "options": {
-                "cwd": "${env:REPOSITORY_DIRECTORY}/colcon_ws"
+                "cwd": "${env:COLCON_WS}"
             },
             "problemMatcher": [
                 "$gcc"
