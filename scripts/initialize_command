@@ -44,6 +44,7 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_agent_devcontainer__stop_project_service
     sfg_agent_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_agent_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
+    sfg_agent_devcontainer__forward_timezone "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__copy_dependencies
     sfg_agent_devcontainer__configure_firewall

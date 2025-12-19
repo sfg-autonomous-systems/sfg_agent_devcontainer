@@ -3,8 +3,11 @@ FROM ubuntu:22.04 AS fast_dds_router
 # Use bash as shell.
 ENV SHELL=/bin/bash
 SHELL ["/bin/bash", "-c"]
-
 USER root
+
+ARG TZ=UTC
+ENV TZ=${TZ}
+RUN echo ${TZ} >"/etc/timezone"
 
 #########################################################################################################
 # Update and install required apt and pip dependencies.                                                 #

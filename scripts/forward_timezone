@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__forward_timezone() {
+    local environment_file="${1}"
+
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Forwarding timezone."
+    local END_TEXT="< Done forwarding timezone."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+    sfg_bash_utils__set_environment_variable "${environment_file}" "TZ" "$(timedatectl show --property=Timezone --value 2>/dev/null || cat /etc/timezone 2>/dev/null || echo UTC)"
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__forward_timezone "${@}"
+fi

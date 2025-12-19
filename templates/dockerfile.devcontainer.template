@@ -13,9 +13,14 @@ FROM sfg-agent-devcontainer-${PLATFORM} AS sfg-agent-devcontainer
 # Use bash as shell.
 ENV SHELL=/bin/bash
 SHELL ["/bin/bash", "-c"]
+USER root
 
 ARG PLATFORM
 ENV PLATFORM=${PLATFORM}
+
+ARG TZ=UTC
+ENV TZ=${TZ}
+RUN echo ${TZ} >"/etc/timezone"
 
 ARG ROS_DOMAIN_ID
 ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
@@ -25,8 +30,6 @@ ENV WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
 
 ARG CONTAINER_REPOSITORY_MOUNT_POINT
 ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
-
-USER root
 
 #########################################################################################################
 # Update and install required apt and pip dependencies.                                                 #
