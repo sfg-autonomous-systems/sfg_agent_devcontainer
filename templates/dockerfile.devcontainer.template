@@ -52,7 +52,12 @@ RUN if echo "$PLATFORM" | grep -q '^generic'; then \
         apt-get update && \
         apt-get install -y --no-install-recommends \
             python3 \
-            python3-pip && \
+            python3-pip \
+	    python3-bloom \
+	    python3-rosdep \
+	    fakeroot \
+	    debhelper \
+	    dh-python && \
         apt-get -y autoremove && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*; \
