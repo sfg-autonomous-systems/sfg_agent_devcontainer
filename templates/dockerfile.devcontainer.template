@@ -48,19 +48,16 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
 # Install python3 and pip
-RUN if echo "$PLATFORM" | grep -q '^generic'; then \
-        apt-get update && \
-        apt-get install -y --no-install-recommends \
+RUN if [[ ${PLATFORM} == "generic"* ]]; then \
+        apt update && apt install -y --no-install-recommends \
             python3 \
             python3-pip \
-	    python3-bloom \
-	    python3-rosdep \
-	    fakeroot \
-	    debhelper \
-	    dh-python && \
-        apt-get -y autoremove && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*; \
+            python3-bloom \
+            python3-rosdep \
+            fakeroot \
+            debhelper \
+            dh-python && \
+        apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*; \
     fi
 
 RUN pip install --upgrade \
