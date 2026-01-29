@@ -1,12 +1,12 @@
 ARG PLATFORM
 
-FROM isaac-ros AS sfg-agent-devcontainer-nvidia-jetson
+FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0 AS sfg-agent-devcontainer-nvidia-jetson
 COPY ".devcontainer/dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
 COPY ".devcontainer/dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
 
-FROM isaac-ros AS sfg-agent-devcontainer-nvidia
-FROM ros:humble-perception-jammy AS sfg-agent-devcontainer-amd
-FROM ros:humble-perception-jammy AS sfg-agent-devcontainer-generic
+FROM nvidia/cuda:12.3.1-devel-ubuntu22.04 AS sfg-agent-devcontainer-nvidia
+FROM ubuntu:22.04 AS sfg-agent-devcontainer-amd
+FROM ubuntu:22.04 AS sfg-agent-devcontainer-generic
 
 FROM sfg-agent-devcontainer-${PLATFORM} AS sfg-agent-devcontainer
 
@@ -22,9 +22,6 @@ ARG TZ=UTC
 ENV TZ=${TZ}
 RUN echo ${TZ} >"/etc/timezone"
 
-ARG ROS_DOMAIN_ID
-ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-
 ARG CONTAINER_WORKSPACE_DIRECTORY
 ENV WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
 
@@ -35,8 +32,8 @@ ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    # For the very first apt update we may need to allow release info change because the base image may be outdated.
-    apt update --allow-releaseinfo-change && apt install -y --no-install-recommends \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt update && apt install -y --no-install-recommends \
         net-tools \
         nano \
         iproute2 \
@@ -44,34 +41,16 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         bmon \
         usbutils \
         gdb \
-        dotnet-sdk-6.0 && \
+        dotnet-sdk-6.0 \
+        sudo \
+        python3 \
+        python3-pip \
+        tzdata && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
-
-# Install python3 and pip
-RUN if [[ ${PLATFORM} == "generic"* ]]; then \
-        apt update && apt install -y --no-install-recommends \
-            python3 \
-            python3-pip \
-            python3-bloom \
-            python3-rosdep \
-            fakeroot \
-            debhelper \
-            dh-python && \
-        apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*; \
-    fi
 
 RUN pip install --upgrade \
         pybind11[global] \
         pybind11-stubgen
-
-#########################################################################################################
-# Setup Isaac ROS apt legacy repository when on nvidia platform.                                        #
-#########################################################################################################
-RUN if [[ ${PLATFORM} == "nvidia"* ]]; then \
-        wget -qO - "https://isaac.download.nvidia.com/isaac-ros/repos.key" | sudo apt-key add - && \
-        grep -qxF "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" "/etc/apt/sources.list" || \
-        echo "deb https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) legacy-release-3.1" | sudo tee -a "/etc/apt/sources.list"; \
-    fi
 
 #########################################################################################################
 # Apply patches.                                                                                        #
@@ -136,8 +115,34 @@ RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
 #########################################################################################################
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
+RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
+    sudo apt update && sudo apt install -y --no-install-recommends \
+        locales \
+        software-properties-common \
+        curl && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    \
+    sudo locale-gen en_US en_US.UTF-8 && \
+    sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
+    sudo add-apt-repository -y universe && \
+    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}') && \
+    curl -L -o "/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
+    sudo dpkg -i "/tmp/ros2-apt-source.deb" && \
+    sudo apt update && sudo apt install -y --no-install-recommends \
+        ros-humble-ros-base \
+        ros-dev-tools \
+        fakeroot \
+        debhelper && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    sudo rosdep init
+
+ENV LANG=en_US.UTF-8
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV COLCON_WS=${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws
+
+ARG ROS_DOMAIN_ID
+ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+ENV ROS_DISTRO=humble
 
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
