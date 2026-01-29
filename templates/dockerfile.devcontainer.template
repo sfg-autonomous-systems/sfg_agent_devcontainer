@@ -34,6 +34,7 @@ ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     export DEBIAN_FRONTEND=noninteractive && \
     apt update && apt install -y --no-install-recommends \
+        curl \
         net-tools \
         nano \
         iproute2 \
@@ -46,6 +47,9 @@ RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
         python3 \
         python3-pip \
         tzdata && \
+    curl -s "https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh" | sudo bash && \
+    apt install -y --no-install-recommends  \
+        git-lfs && \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
 RUN pip install --upgrade \
@@ -118,8 +122,7 @@ COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSP
 RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
     sudo apt update && sudo apt install -y --no-install-recommends \
         locales \
-        software-properties-common \
-        curl && \
+        software-properties-common && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     \
     sudo locale-gen en_US en_US.UTF-8 && \
