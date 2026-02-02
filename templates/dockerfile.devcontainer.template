@@ -60,6 +60,16 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
 RUN apt update && \
     # On nvidia-jetson we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
     if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
+        # The nvidia-jetson base image we use comes with an NVIDIA accelerated version of OpenCV. In theory this is good, but in practice it
+        # seems to be ABI incompatible with ffmpeg_image_transport and causes issues. Therefore we uninstall it and install the standard Ubuntu OpenCV version.
+        apt-get purge -y \
+            libopencv* \
+            nvidia-opencv* \ 
+            opencv-* && \
+        apt-get install -y --no-install-recommends --allow-downgrades \
+            libopencv-dev=4.5.4+dfsg-9ubuntu4 \
+            python3-opencv=4.5.4+dfsg-9ubuntu4 && \
+        \
         mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         # Install ffmpeg.
         git clone -b "master" --depth 1 "https://github.com/berndpfrommer/jetson-ffmpeg.git" && \
@@ -174,17 +184,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
         ros-${ROS_DISTRO}-xacro \
         ros-dev-tools && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
-    \
-    # The base image we use for nvidia-jetson contains certain optimized libraries that end up fulfilling rosdep dependencies but
-    # are not named as expected by rosdep. Therefore we provide a custom rosdep yaml file to map those dependencies correctly.
-    if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
-        sudo mkdir -p "/etc/ros/rosdep/sources.list.d" && \
-        sudo cp "/tmp/config/${PLATFORM}/rosdeps.yaml" "/etc/ros/rosdep/rosdeps.yaml" && \
-        echo "yaml file:///etc/ros/rosdep/rosdeps.yaml" | sudo tee "/etc/ros/rosdep/sources.list.d/10-${PLATFORM}-rosdeps.list"; \
-    fi && \
-    \
     sudo rosdep init && \
-    \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
     echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" | sudo tee -a "/etc/bash.bashrc" && \
