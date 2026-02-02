@@ -12,8 +12,7 @@ RUN echo ${TZ} >"/etc/timezone"
 #########################################################################################################
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
-RUN --mount=type=cache,id=apt_cache_fast_dds_router,target="/var/cache/apt" \
-    apt update && apt install -y --no-install-recommends \
+RUN apt update && apt install -y --no-install-recommends \
         sudo \
         make \
         cmake \

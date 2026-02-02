@@ -1,0 +1,9 @@
+libopencv-dev:
+  ubuntu:
+    - nvidia-opencv-dev
+libopencv-imgproc-dev:
+  ubuntu:
+    - nvidia-opencv-dev
+python3-opencv:
+  ubuntu:
+    - nvidia-opencv-dev

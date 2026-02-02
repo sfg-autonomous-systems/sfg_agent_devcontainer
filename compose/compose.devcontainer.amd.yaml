@@ -3,3 +3,6 @@ services:
     extends:
       file: compose.devcontainer.generic.yaml
       service: sfg_agent_devcontainer
+    environment:
+      - AMD_VISIBLE_DEVICES=all
+    runtime: amd

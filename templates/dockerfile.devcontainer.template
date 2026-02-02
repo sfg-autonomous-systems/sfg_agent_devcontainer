@@ -5,7 +5,7 @@ COPY ".devcontainer/dependencies/jetson_multimedia_api" "/usr/src/jetson_multime
 COPY ".devcontainer/dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
 
 FROM nvidia/cuda:12.3.1-devel-ubuntu22.04 AS sfg-agent-devcontainer-nvidia
-FROM ubuntu:22.04 AS sfg-agent-devcontainer-amd
+FROM rocm/dev-ubuntu-22.04 AS sfg-agent-devcontainer-amd
 FROM ubuntu:22.04 AS sfg-agent-devcontainer-generic
 
 FROM sfg-agent-devcontainer-${PLATFORM} AS sfg-agent-devcontainer
@@ -31,48 +31,73 @@ ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 #########################################################################################################
 # Update and install required apt and pip dependencies.                                                 #
 #########################################################################################################
-RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt update && apt install -y --no-install-recommends \
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    # Configure apt to use IPv4 because otherwise apt operations are slow as fuck!?
+    echo 'Acquire::ForceIPv4 "true";' >"/etc/apt/apt.conf.d/99-force-ipv4" && \
+    apt update && apt upgrade -y && apt install -y --no-install-recommends \
+        bmon \
+        build-essential \
+        cmake \
         curl \
-        net-tools \
-        nano \
+        dotnet-sdk-6.0 \
+        gdb \
+        git-lfs \
         iproute2 \
         iperf3 \
-        bmon \
-        usbutils \
-        gdb \
-        dotnet-sdk-6.0 \
-        sudo \
+        libudev-dev \
+        libusb-1.0-0-dev \
+        nano \
+        net-tools \
+        pkg-config \
         python3 \
         python3-pip \
-        tzdata && \
-    curl -s "https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh" | sudo bash && \
-    apt install -y --no-install-recommends  \
-        git-lfs && \
+        sudo \
+        tzdata \
+        usbutils && \
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+
+# Install ffmpeg.
+RUN apt update && \
+    # On nvidia-jetson we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
+    if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
+        mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
+        # Install ffmpeg.
+        git clone -b "master" --depth 1 "https://github.com/berndpfrommer/jetson-ffmpeg.git" && \
+        cd "jetson-ffmpeg" && \
+        mkdir "build" && cd "build" && \
+        cmake -DCMAKE_INSTALL_PREFIX:PATH="/usr/local" ".." && make -j$(nproc) && make install && ldconfig && \
+        cd "../.." && \
+        git clone -b "release/7.1" --depth 1 "git://source.ffmpeg.org/ffmpeg.git" && \
+        cd "jetson-ffmpeg" && \
+        "./ffpatch.sh" "../ffmpeg" && \
+        cd "../ffmpeg" && \
+        PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}" "./configure" --enable-nvmpi --enable-shared --disable-static --prefix="/usr/local" && \
+        make -j$(nproc) && \
+        make install && \
+        ldconfig && \
+        rm -rf "${HOME}/dependencies"; \
+    else \
+        apt install -y --no-install-recommends \
+            ffmpeg \
+            libavcodec58 \
+            libavfilter7 \
+            libavformat58 \
+            libavutil56 \
+            libpostproc55 \
+            libswscale5 \
+            libswresample3; \
+    fi && \
+    \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
 RUN pip install --upgrade \
         pybind11[global] \
-        pybind11-stubgen
-
-#########################################################################################################
-# Apply patches.                                                                                        #
-#########################################################################################################
-WORKDIR /
-
-RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
-    # Apply general patches.
-    for PATCH in "/tmp/patches/"*".patch"; do \
-        # Check if the patch file actually exists (glob might return the pattern if no files match).
-        [ -f "${PATCH}" ] || continue; \
-        patch -p1 --forward <"${PATCH}"; \
-    done && \
-    # Apply platform specific patches.
-    for PATCH in "/tmp/patches/${PLATFORM}/"*".patch"; do \
-        [ -f "${PATCH}" ] || continue; \
-        patch -p1 --forward <"${PATCH}"; \
-    done
+        pybind11-stubgen && \
+    \
+    if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
+        pip install \
+            jetson-stats; \
+    fi
 
 #########################################################################################################
 # Create a non-root user.                                                                               #
@@ -119,26 +144,6 @@ RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
 #########################################################################################################
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
-RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
-    sudo apt update && sudo apt install -y --no-install-recommends \
-        locales \
-        software-properties-common && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
-    \
-    sudo locale-gen en_US en_US.UTF-8 && \
-    sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
-    sudo add-apt-repository -y universe && \
-    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}') && \
-    curl -L -o "/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
-    sudo dpkg -i "/tmp/ros2-apt-source.deb" && \
-    sudo apt update && sudo apt install -y --no-install-recommends \
-        ros-humble-ros-base \
-        ros-dev-tools \
-        fakeroot \
-        debhelper && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
-    sudo rosdep init
-
 ENV LANG=en_US.UTF-8
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV COLCON_WS=${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws
@@ -147,57 +152,51 @@ ARG ROS_DOMAIN_ID
 ENV ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
 ENV ROS_DISTRO=humble
 
-RUN --mount=type=cache,id=apt_cache_devcontainer,target="/var/cache/apt" \
+RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
     sudo apt update && sudo apt install -y --no-install-recommends \
-        ros-${ROS_DISTRO}-magic-enum \
-        ros-${ROS_DISTRO}-xacro \
-        python3-colcon-mixin && \
+        locales \
+        software-properties-common && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    \
+    sudo locale-gen ${LANG} && \
+    sudo update-locale LC_ALL=${LANG} LANG=${LANG} && \
+    sudo add-apt-repository -y universe && \
+    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}') && \
+    curl -L -o "/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
+    sudo dpkg -i "/tmp/ros2-apt-source.deb" && \
+    sudo apt update && sudo apt install -y --no-install-recommends \
+        debhelper \
+        fakeroot \
+        python3-colcon-mixin \
+        ros-${ROS_DISTRO}-diagnostic-updater \
+        ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-ros-base \
+        ros-${ROS_DISTRO}-xacro \
+        ros-dev-tools && \
+    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    \
+    # The base image we use for nvidia-jetson contains certain optimized libraries that end up fulfilling rosdep dependencies but
+    # are not named as expected by rosdep. Therefore we provide a custom rosdep yaml file to map those dependencies correctly.
+    if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
+        sudo mkdir -p "/etc/ros/rosdep/sources.list.d" && \
+        sudo cp "/tmp/config/${PLATFORM}/rosdeps.yaml" "/etc/ros/rosdep/rosdeps.yaml" && \
+        echo "yaml file:///etc/ros/rosdep/rosdeps.yaml" | sudo tee "/etc/ros/rosdep/sources.list.d/10-${PLATFORM}-rosdeps.list"; \
+    fi && \
+    \
+    sudo rosdep init && \
     \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
-    echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" | sudo tee -a "/etc/bash.bashrc"
-
-COPY ".devcontainer/config/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
+    echo "[ -f ${COLCON_WS}/install/setup.bash ] && source ${COLCON_WS}/install/setup.bash" | sudo tee -a "/etc/bash.bashrc" && \
+    cp "/tmp/config/colcon_defaults.yaml" "${HOME}/.colcon/defaults.yaml"
 
 # Install ffmpeg_image_transport.
-RUN sudo apt update && \
-    # On nvidia-jetson we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
-    if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
-        mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
-        # Install ffmpeg.
-        git clone -b "master" --depth 1 "https://github.com/berndpfrommer/jetson-ffmpeg.git" && \
-        cd "jetson-ffmpeg" && \
-        mkdir "build" && cd "build" && \
-        cmake -DCMAKE_INSTALL_PREFIX:PATH="/usr/local" ".." && make -j$(nproc) && sudo make install && sudo ldconfig && \
-        cd "../.." && \
-        git clone -b "release/7.1" --depth 1 "git://source.ffmpeg.org/ffmpeg.git" && \
-        cd "jetson-ffmpeg" && \
-        "./ffpatch.sh" "../ffmpeg" && \
-        cd "../ffmpeg" && \
-        "./configure" --enable-nvmpi --enable-shared --disable-static --prefix="/usr/local" && \
-        make -j$(nproc) && \
-        sudo make install && \
-        sudo ldconfig && \
-        sudo rm -rf "${HOME}/dependencies"; \
-    else \
-        sudo apt install -y --no-install-recommends \
-            ffmpeg \
-            libavcodec58 \
-            libavformat58 \
-            libavutil56 \
-            libswscale5 \
-            libswresample3 \
-            libavfilter7 \
-            libpostproc55; \
-    fi && \
-    \
-    mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
+RUN mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
     git clone -b "3.0.2" --depth 1 "https://github.com/ros-misc-utilities/ffmpeg_image_transport.git" && \
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && sudo -E rosdep install -y --from-paths "." --ignore-src && \
+    sudo apt update && rosdep update && sudo -E rosdep install -y --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
@@ -235,6 +234,8 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         bloom-generate rosdebian && \
         # Use all cores for building.
         sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
+        # Ignore missing info for shlibdeps.
+        sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' "debian/rules" && \
         # Build the package.
         fakeroot "debian/rules" binary && \
         # Install the package.
@@ -243,6 +244,24 @@ RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"*
+
+#########################################################################################################
+# Apply patches.                                                                                        #
+#########################################################################################################
+WORKDIR /
+
+RUN --mount=type=bind,source=".devcontainer/patches",target="/tmp/patches",ro \
+    # Apply general patches.
+    for PATCH in "/tmp/patches/"*".patch"; do \
+        # Check if the patch file actually exists (glob might return the pattern if no files match).
+        [ -f "${PATCH}" ] || continue; \
+        sudo patch -p1 --forward <"${PATCH}"; \
+    done && \
+    # Apply platform specific patches.
+    for PATCH in "/tmp/patches/${PLATFORM}/"*".patch"; do \
+        [ -f "${PATCH}" ] || continue; \
+        sudo patch -p1 --forward <"${PATCH}"; \
+    done
 
 #########################################################################################################
 # User dockerfile will be inserted below.                                                               #
