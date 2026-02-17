@@ -19,7 +19,7 @@
                 "-c",
                 // For some reason we need to source the ROS setup file in the same command as we launch the node.
                 // Perhaps we also need to source the workspace setup file here as well?
-                "source \"/opt/ros/${ROS_DISTRO}/setup.bash\"; \"${input:cppNodePath}\" ${input:args}"
+                "source \"/opt/ros/${env:ROS_DISTRO}/setup.bash\"; \"${input:cppNodePath}\" ${input:args}"
             ],
             // In order for GDB to find the source files breakpoints are set in, we need to set the CWD appropriately.
             "cwd": "${env:REPOSITORY_DIRECTORY}",
