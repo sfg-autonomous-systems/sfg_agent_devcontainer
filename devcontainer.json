@@ -70,9 +70,10 @@
                     }
                 },
                 "mypy-type-checker.args": [
-                    "--config-file=${containerEnv:REPOSITORY_DIRECTORY}/.mypy.ini"
+                    "--config-file=${containerWorkspaceFolder}/.vscode/mypy.ini"
                 ],
                 // C++ settings.
+                "C_Cpp.clang_format_style": "file:${containerWorkspaceFolder}/.vscode/clang_format.yaml",
                 "[cpp]": {
                     "editor.defaultFormatter": "ms-vscode.cpptools"
                 },
