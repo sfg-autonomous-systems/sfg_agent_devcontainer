@@ -49,6 +49,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         nano \
         net-tools \
         pkg-config \
+        python-is-python3 \
         python3 \
         python3-pip \
         ssh-client \
