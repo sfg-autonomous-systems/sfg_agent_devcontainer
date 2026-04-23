@@ -81,5 +81,5 @@ RUN PROJECT_PATHS=" \
 #########################################################################################################
 # Run DDS Router.                                                                                       #
 #########################################################################################################
-CMD envsubst <"/fast_dds_router_config.yaml" >"/tmp/fast_dds_router_config.yaml" && \
-    ddsrouter -c "/tmp/fast_dds_router_config.yaml"
+CMD envsubst <"/fast_dds_router_config.yaml.template" >"/fast_dds_router_config.yaml" && \
+    ddsrouter -c "/fast_dds_router_config.yaml"

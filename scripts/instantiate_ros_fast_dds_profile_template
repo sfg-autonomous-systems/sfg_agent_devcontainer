@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__instantiate_ros_fast_dds_profile_template() {
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Instantiating ROS Fast DDS profile."
+    local END_TEXT="< Done instantiating ROS Fast DDS profile."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+    local ROS_FAST_DDS_PROFILE_TEMPLATE="${SCRIPT_DIR}/../config/ros_fast_dds_profile.xml.template"
+
+    local default_interface
+    default_interface="$(ip route | grep '^default' | awk '{print $5}' | head -n 1)"
+
+    if [[ -z "${default_interface}" ]]; then
+        sfg_bash_utils__print_error "Error: Could not determine the default network interface."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 1
+    fi
+
+    local interface_whitelist
+    interface_whitelist="$(ip -o -4 addr show |
+        awk -v default_interface="${default_interface}" '$2 != default_interface {print $4}' |
+        cut -d/ -f1 |
+        awk '{
+        if (NR == 1) {
+            printf "<address>%s</address>", $1
+        } else {
+            printf "\n        <address>%s</address>", $1
+        }
+    }')"
+
+    # shellcheck disable=SC2016
+    INTERFACE_WHITELIST="${interface_whitelist}" envsubst '${INTERFACE_WHITELIST}' <"${ROS_FAST_DDS_PROFILE_TEMPLATE}" >"${SCRIPT_DIR}/../config/ros_fast_dds_profile.xml"
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__instantiate_ros_fast_dds_profile_template "${@}"
+fi

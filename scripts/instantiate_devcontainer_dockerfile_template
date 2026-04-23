@@ -11,7 +11,7 @@ sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template() {
     local END_TEXT="< Done instantiating devcontainer dockerfile template."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../templates/dockerfile.devcontainer.template"
+    local DOCKERFILE_TEMPLATE="${SCRIPT_DIR}/../docker/dockerfile.devcontainer.template"
     local dockerfile_user="${devcontainer_user_directory}/dockerfile.user"
     local DOCKERFILE="${SCRIPT_DIR}/../docker/dockerfile.devcontainer"
 

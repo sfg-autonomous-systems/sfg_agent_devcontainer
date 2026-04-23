@@ -12,7 +12,7 @@ sfg_agent_devcontainer__configure_project_as_service() {
     local END_TEXT="< Done configuring project as service."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-    local SERVICE_TEMPLATE="${SCRIPT_DIR}/../templates/service.template"
+    local SERVICE_TEMPLATE="${SCRIPT_DIR}/../config/service.template"
     local service_filename
     service_filename="$(sfg_agent_devcontainer__get_project_name).service"
     local service_filepath="${HOME}/.config/systemd/user/${service_filename}"
@@ -54,8 +54,7 @@ sfg_agent_devcontainer__configure_project_as_service() {
         fi
 
         # shellcheck disable=SC2016
-        PROJECT_NAME="$(sfg_agent_devcontainer__get_project_name)" WORKING_DIRECTORY="${devcontainer_user_directory}" \
-            envsubst '${PROJECT_NAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" >"${service_filepath}"
+        PROJECT_NAME="$(sfg_agent_devcontainer__get_project_name)" WORKING_DIRECTORY="${devcontainer_user_directory}" envsubst '${PROJECT_NAME} ${WORKING_DIRECTORY}' <"${SERVICE_TEMPLATE}" >"${service_filepath}"
         systemctl --user daemon-reload
         systemctl --user enable "${service_filename}"
 
