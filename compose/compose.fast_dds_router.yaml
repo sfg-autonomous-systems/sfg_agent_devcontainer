@@ -11,3 +11,5 @@ services:
         target: /etc/localtime
         read_only: true
     network_mode: host
+    privileged: true
+    ipc: host

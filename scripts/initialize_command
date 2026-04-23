@@ -50,7 +50,6 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_agent_devcontainer__configure_firewall
     sfg_agent_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
-    sfg_agent_devcontainer__instantiate_ros_fast_dds_profile_template
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 

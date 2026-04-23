@@ -43,7 +43,7 @@ WORKDIR ${DDS_ROUTER_DIRECTORY}
 
 RUN mkdir "src" "build" && \
     wget "https://raw.githubusercontent.com/eProsima/DDS-Router/${DDS_ROUTER_VERSION}/ddsrouter.repos" && \
-    vcs import "src" < "ddsrouter.repos"
+    vcs import "src" <"ddsrouter.repos"
 
 ENV CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 ENV LD_LIBRARY_PATH=/usr/local/lib/:${LD_LIBRARY_PATH}
