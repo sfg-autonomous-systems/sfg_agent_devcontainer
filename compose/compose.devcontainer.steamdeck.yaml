@@ -1,0 +1,9 @@
+services:
+  sfg_agent_devcontainer:
+    extends:
+      file: compose.devcontainer.generic.yaml
+      service: sfg_agent_devcontainer
+    security_opt:
+      - label=disable
+    environment:
+      - HSA_OVERRIDE_GFX_VERSION=10.3.0
