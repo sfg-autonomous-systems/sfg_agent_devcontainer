@@ -10,6 +10,12 @@ sfg_agent_devcontainer__configure_firewall() {
 
     sfg_bash_utils__print_info "${START_TEXT}"
 
+    if [[ ! -t 0 ]]; then
+        sfg_bash_utils__print_plain "No terminal available for input. Skipping firewall configuration."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
     if ! command -v ufw &>"/dev/null"; then
         sfg_bash_utils__print_plain "No firewall is installed, nothing needs to be done."
         sfg_bash_utils__print_info "${END_TEXT}"

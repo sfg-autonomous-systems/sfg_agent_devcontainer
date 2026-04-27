@@ -12,6 +12,13 @@ sfg_agent_devcontainer__configure_project_as_service() {
     local END_TEXT="< Done configuring project as service."
 
     sfg_bash_utils__print_info "${START_TEXT}"
+
+    if [[ ! -t 0 ]]; then
+        sfg_bash_utils__print_plain "No terminal available for input. Skipping project service configuration."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+    
     local SERVICE_TEMPLATE="${SCRIPT_DIR}/../config/service.template"
     local service_filename
     service_filename="$(sfg_agent_devcontainer__get_project_name).service"
