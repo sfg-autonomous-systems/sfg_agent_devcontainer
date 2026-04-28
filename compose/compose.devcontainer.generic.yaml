@@ -6,7 +6,6 @@ services:
       args:
         - PLATFORM=${PLATFORM}
         - TZ=${TZ}
-        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
         - CONTAINER_WORKSPACE_DIRECTORY=${CONTAINER_WORKSPACE_DIRECTORY}
         - CONTAINER_REPOSITORY_MOUNT_POINT=${CONTAINER_REPOSITORY_MOUNT_POINT}
         - USERNAME=${LOCAL_USERNAME}
@@ -27,6 +26,7 @@ services:
         target: /etc/localtime
         read_only: true
     environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - DISPLAY
       - TERM=${TERM:-xterm}
     network_mode: host
