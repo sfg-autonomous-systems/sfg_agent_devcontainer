@@ -25,7 +25,7 @@ sfg_agent_devcontainer__configure_firewall() {
     local MESSAGE="Firewall detected. Do you want to configure it? [y/N] "
     read -rp "${MESSAGE}" confirm
 
-    if [[ ! "${confirm}" == "y" ]]; then
+    if [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
         sfg_bash_utils__print_info "${END_TEXT}"
         return 0
     fi
