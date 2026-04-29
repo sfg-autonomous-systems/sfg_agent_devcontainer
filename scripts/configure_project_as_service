@@ -44,7 +44,7 @@ sfg_agent_devcontainer__configure_project_as_service() {
 
         if [[ "${is_lingering}" == "true" ]]; then
             local message
-            message="For the service to start on boot, linger was enabled for user $(whoami). Do you want to disable it? [y/N] "
+            message="For the service to start on boot, linger was enabled for the user '$(whoami)'. Do you want to disable it? [y/N] "
             read -rp "${message}" confirm
 
             if [[ "${confirm}" =~ ^[Yy]$ ]]; then
