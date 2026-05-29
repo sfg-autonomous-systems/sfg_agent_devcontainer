@@ -1,12 +1,12 @@
 ARG PLATFORM
 
-FROM rocm/dev-ubuntu-22.04 AS sfg-agent-devcontainer-amd
-FROM ubuntu:22.04 AS sfg-agent-devcontainer-generic
-FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0 AS sfg-agent-devcontainer-nvidia-jetson
+FROM rocm/dev-ubuntu-24.04 AS sfg-agent-devcontainer-amd
+FROM ubuntu:24.04 AS sfg-agent-devcontainer-generic
+FROM nvidia/cuda:12.5.1-devel-ubuntu24.04 AS sfg-agent-devcontainer-nvidia-jetson
 COPY ".devcontainer/dependencies/jetson_multimedia_api" "/usr/src/jetson_multimedia_api"
 COPY ".devcontainer/dependencies/nvidia" "/usr/lib/aarch64-linux-gnu/tegra"
-FROM nvidia/cuda:12.3.1-devel-ubuntu22.04 AS sfg-agent-devcontainer-nvidia
-FROM rocm/dev-ubuntu-22.04 AS sfg-agent-devcontainer-steamdeck
+FROM nvidia/cuda:12.5.1-devel-ubuntu24.04 AS sfg-agent-devcontainer-nvidia
+FROM rocm/dev-ubuntu-24.04 AS sfg-agent-devcontainer-steamdeck
 
 FROM sfg-agent-devcontainer-${PLATFORM} AS sfg-agent-devcontainer
 
@@ -39,7 +39,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         build-essential \
         cmake \
         curl \
-        dotnet-sdk-6.0 \
+        dotnet-sdk-8.0 \
         gdb \
         git-lfs \
         iproute2 \
@@ -69,8 +69,8 @@ RUN apt update && \
             nvidia-opencv* \ 
             opencv-* && \
         apt-get install -y --no-install-recommends --allow-downgrades \
-            libopencv-dev=4.5.4+dfsg-9ubuntu4 \
-            python3-opencv=4.5.4+dfsg-9ubuntu4 && \
+            libopencv-dev \
+            python3-openc && \
         \
         mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
         # Install ffmpeg.
@@ -91,23 +91,23 @@ RUN apt update && \
     else \
         apt install -y --no-install-recommends \
             ffmpeg \
-            libavcodec58 \
-            libavfilter7 \
-            libavformat58 \
-            libavutil56 \
-            libpostproc55 \
-            libswscale5 \
-            libswresample3; \
+            libavcodec-dev \
+            libavfilter-dev \
+            libavformat-dev \
+            libavutil-dev \
+            libpostproc-dev \
+            libswscale-dev \
+            libswresample-dev; \
     fi && \
     \
     apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
 
-RUN pip install --upgrade \
+RUN pip install --break-system-packages --upgrade \
         pybind11[global] \
         pybind11-stubgen && \
     \
     if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
-        pip install \
+        pip install --break-system-packages \
             jetson-stats; \
     fi
 
@@ -159,7 +159,7 @@ COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSP
 ENV LANG=en_US.UTF-8
 ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 ENV COLCON_WS=${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws
-ENV ROS_DISTRO=humble
+ENV ROS_DISTRO=kilted
 
 RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
     sudo apt update && sudo apt install -y --no-install-recommends \
@@ -218,32 +218,6 @@ RUN mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/co
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"* && \
     sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*
-
-# Install a backport of jazzy's compressed_depth_image_transport to make RVL compression available.
-RUN mkdir -p "${HOME}/dependencies" && cd "${HOME}/dependencies" && \
-    mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/colcon_ws/src" && \
-    git clone -b "humble-backport" --depth 1 "https://gitlab+deploy-token-29:gldt-rYgXc6pABSLKuWS82qpJ@gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/image-transport-plugins-humble-backport.git" "image_transport_plugins_humble_backport" && \
-    cd ".." && \
-    source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    rosdep update && \
-    cd "src/image_transport_plugins_humble_backport" && \
-    \
-    for package in "compressed_depth_image_transport"; do \
-        cd "${package}" && \
-        # Generate debian files.
-        bloom-generate rosdebian && \
-        # Use all cores for building.
-        sed -i 's/\bdh_auto_build\b/& -- -j$(nproc)/g' "debian/rules" && \
-        # Ignore missing info for shlibdeps.
-        sed -i 's/dh_shlibdeps -/dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info -/g' "debian/rules" && \
-        # Build the package.
-        fakeroot "debian/rules" binary && \
-        # Install the package.
-        cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
-    done && \
-    \
-    rm -rf "${HOME}/dependencies" && \
-    sudo rm -rf "${HOME}/.ros/rosdep/"*
 
 #########################################################################################################
 # Apply patches.                                                                                        #
