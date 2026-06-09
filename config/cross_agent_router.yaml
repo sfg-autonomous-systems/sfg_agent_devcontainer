@@ -1,7 +1,34 @@
 mode: router
+
 scouting:
   multicast:
     enabled: true
     autoconnect:
       router:
         - router
+
+access_control:
+  enabled: true
+  default_permission: deny
+  rules:
+    - id: local
+      permission: allow
+      key_exprs: ["**"]
+    - id: global
+      permission: allow
+      key_exprs:
+        - "*/*/global/**"
+        - "*/*/tf/**"
+        - "*/*/tf_static/**"
+        - "*/*/ros_discovery_info/**"
+  subjects:
+    - id: local
+      interfaces: ["lo"]
+    - id: global
+  policies:
+    - id: local
+      rules: ["local"]
+      subjects: ["local"]
+    - id: global
+      rules: ["global"]
+      subjects: ["global"]
