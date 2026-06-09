@@ -5,14 +5,14 @@ include:
       - ../.devcontainer/compose/compose.devcontainer.${PLATFORM}.yaml
 
 services:
-  cross_agent_zenoh_router:
+  cross_agent_router:
     extends:
       file: ../.devcontainer/compose/compose.zenoh_router.yaml
       service: zenoh_router
     volumes:
       - type: bind
-        source: ../.devcontainer/config/cross_agent_zenoh_router.yaml
-        target: /cross_agent_zenoh_router.yaml
+        source: ../.devcontainer/config/cross_agent_router.yaml
+        target: /cross_agent_router.yaml
         read_only: true
     environment:
-      - ZENOH_ROUTER_CONFIG_URI=/cross_agent_zenoh_router.yaml
+      - ZENOH_ROUTER_CONFIG_URI=/cross_agent_router.yaml
