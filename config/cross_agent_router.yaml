@@ -12,9 +12,27 @@ access_control:
   default_permission: deny
   rules:
     - id: local
+      messages:
+        [
+          "put",
+          "declare_subscriber",
+          "query",
+          "declare_queryable",
+          "liveliness_token",
+          "declare_liveliness_subscriber",
+        ]
       permission: allow
       key_exprs: ["**"]
     - id: global
+      messages:
+        [
+          "put",
+          "declare_subscriber",
+          "query",
+          "declare_queryable",
+          "liveliness_token",
+          "declare_liveliness_subscriber",
+        ]
       permission: allow
       key_exprs:
         - "*/*/global/**"
