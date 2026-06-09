@@ -1,8 +1,8 @@
 services:
-  fast_dds_router:
+  zenoh_router:
     build:
       context: ../..
-      dockerfile: .devcontainer/docker/dockerfile.fast_dds_router
+      dockerfile: .devcontainer/docker/dockerfile.zenoh_router
       args:
         - TZ=${TZ}
     volumes:

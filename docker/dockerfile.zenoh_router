@@ -1,0 +1,15 @@
+FROM ros:kilted-ros-core-noble
+
+# Use bash as shell.
+ENV SHELL=/bin/bash
+SHELL ["/bin/bash", "-c"]
+USER root
+
+#########################################################################################################
+# Update and install required apt dependencies.                                                         #
+#########################################################################################################
+RUN apt update && apt upgrade -y && apt install -y --no-install-recommends \
+        ros-kilted-rmw-zenoh-cpp && \
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+
+CMD ["/bin/bash", "-c", "source /opt/ros/kilted/setup.bash && ros2 run rmw_zenoh_cpp rmw_zenohd"]

@@ -34,7 +34,6 @@ sfg_agent_devcontainer__initialize_command() {
     local ENVIRONMENT_FILE="${DEVCONTAINER_USER_DIRECTORY}/.env"
 
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
-    sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
     sfg_bash_utils__set_up_repository "${ENVIRONMENT_FILE}" "${local_workspace_directory}" "${container_workspace_directory}"
     sfg_bash_utils__set_up_ntp "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"

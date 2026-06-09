@@ -159,7 +159,7 @@ RUN sudo chown "${USERNAME}":"${USERNAME}" "." && \
 COPY --chown=${USERNAME}:${USERNAME} ".devcontainer/.vscode" "${CONTAINER_WORKSPACE_DIRECTORY}/.vscode"
 
 ENV LANG=en_US.UTF-8
-ENV RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
 ENV COLCON_WS=${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws
 ENV ROS_DISTRO=kilted
 
@@ -181,6 +181,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
         python3-colcon-mixin \
         ros-${ROS_DISTRO}-diagnostic-updater \
         ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-rmw-zenoh-cpp \
         ros-${ROS_DISTRO}-ros-base \
         ros-${ROS_DISTRO}-xacro \
         ros-dev-tools && \

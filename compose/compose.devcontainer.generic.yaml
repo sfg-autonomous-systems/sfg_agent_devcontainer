@@ -26,7 +26,6 @@ services:
         target: /etc/localtime
         read_only: true
     environment:
-      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - DISPLAY
       - TERM=${TERM:-xterm}
     network_mode: host
