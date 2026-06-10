@@ -34,19 +34,15 @@ access_control:
           "declare_liveliness_subscriber",
         ]
       permission: allow
-      key_exprs:
-        - "*/*/global/**"
-        - "*/*/tf/**"
-        - "*/*/tf_static/**"
-        - "*/*/ros_discovery_info/**"
+      key_exprs: ["*/global/**", "*/tf/*/*", "*/tf_static/*/*"]
   subjects:
     - id: local
       interfaces: ["lo"]
     - id: global
   policies:
-    - id: local
+    - id: local_policy
       rules: ["local"]
       subjects: ["local"]
-    - id: global
+    - id: global_policy
       rules: ["global"]
       subjects: ["global"]
