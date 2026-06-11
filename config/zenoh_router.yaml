@@ -1,0 +1,8 @@
+mode: router
+
+scouting:
+  multicast:
+    enabled: true
+    autoconnect:
+      router:
+        - router

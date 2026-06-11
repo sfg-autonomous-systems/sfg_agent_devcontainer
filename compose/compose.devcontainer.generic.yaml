@@ -26,8 +26,22 @@ services:
         target: /etc/localtime
         read_only: true
     environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - DISPLAY
       - TERM=${TERM:-xterm}
     network_mode: host
     privileged: true
     ipc: host
+
+  sfg_cross_agent_router:
+      extends:
+        file: ../.devcontainer/compose/compose.zenoh_router.yaml
+        service: zenoh_router
+      volumes:
+        - type: bind
+          source: ../.devcontainer/config/zenoh_router.yaml
+          target: /zenoh_router.yaml
+          read_only: true
+      environment:
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ZENOH_ROUTER_CONFIG_URI=/zenoh_router.yaml
