@@ -3,3 +3,4 @@ name: ${PROJECT_NAME}
 include:
   - path:
       - ../.devcontainer/compose/compose.devcontainer.${PLATFORM}.yaml
+      - ../.devcontainer/compose/compose.cross_domain_router.yaml

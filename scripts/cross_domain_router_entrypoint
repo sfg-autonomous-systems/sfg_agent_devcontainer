@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__cross_domain_router_entrypoint() {
+    source "/opt/ros/kilted/setup.bash"
+    echo "Starting zenoh router..."
+    ros2 run rmw_zenoh_cpp rmw_zenohd &
+    echo "Starting zenoh-domain-bridge..."
+    zenoh-domain-bridge "${@}" &
+
+    wait -n
+    exit $?
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__cross_domain_router_entrypoint "${@}"
+fi

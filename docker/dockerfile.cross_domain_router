@@ -1,0 +1,24 @@
+FROM ros:kilted-ros-core-noble
+
+# Use bash as shell.
+ENV SHELL=/bin/bash
+SHELL ["/bin/bash", "-c"]
+USER root
+
+#########################################################################################################
+# Update and install required apt and pip dependencies.                                                 #
+#########################################################################################################
+RUN apt update && apt upgrade -y && apt install -y --no-install-recommends \
+        build-essential \
+        git \
+        python3-pip \
+        ros-kilted-rmw-zenoh-cpp && \
+    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+
+RUN git clone -b "kilted" --depth 1 "https://gitlab+deploy-token-37:gldt-e7yRzyyEP4y9QJgpLjRq@gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/zenoh-domain-bridge.git" && \
+    cd "zenoh-domain-bridge" && \
+    pip install --break-system-packages .
+
+COPY .devcontainer/scripts/cross_domain_router_entrypoint /entrypoint
+ENTRYPOINT ["/entrypoint"]
+CMD ["-l", "debug"]

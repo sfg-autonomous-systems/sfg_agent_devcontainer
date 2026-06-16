@@ -1,0 +1,22 @@
+services:
+  cross_domain_router:
+    build:
+      context: ../..
+      dockerfile: .devcontainer/docker/dockerfile.cross_domain_router
+      args:
+        - TZ=${TZ}
+    volumes:
+      - type: bind
+        source: ../config/cross_domain_router.yaml
+        target: /cross_domain_router.yaml
+        read_only: true
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - ZENOH_ROUTER_CONFIG_URI=/cross_domain_router.yaml
+    network_mode: host
+    privileged: true
+    ipc: host
