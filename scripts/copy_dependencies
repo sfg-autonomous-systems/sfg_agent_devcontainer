@@ -16,7 +16,7 @@ sfg_agent_devcontainer__copy_dependencies() {
     "nvidia-jetson")
         dependencies+=(
             "/usr/src/jetson_multimedia_api"
-            "$(realpath /usr/lib/aarch64-linux-gnu/tegra)"
+            "$(realpath "/usr/lib/aarch64-linux-gnu/tegra")"
         )
         ;;
     "nvidia") ;;
