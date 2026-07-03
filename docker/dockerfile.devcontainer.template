@@ -29,12 +29,12 @@ ARG CONTAINER_REPOSITORY_MOUNT_POINT
 ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 
 #########################################################################################################
-# Update and install required apt and pip dependencies.                                                 #
+# Update and install required apt-get and pip dependencies.                                                 #
 #########################################################################################################
 RUN export DEBIAN_FRONTEND=noninteractive && \
-    # Configure apt to use IPv4 because otherwise apt operations are slow as fuck!?
+    # Configure apt-get to use IPv4 because otherwise apt-get operations are slow as fuck!?
     echo 'Acquire::ForceIPv4 "true";' >"/etc/apt/apt.conf.d/99-force-ipv4" && \
-    apt update && apt upgrade -y && apt install -y --no-install-recommends \
+    apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
         bmon \
         build-essential \
         cmake \
@@ -56,10 +56,10 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
         sudo \
         tzdata \
         usbutils && \
-    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+    apt-get -y autoremove && apt-get clean && rm -rf "/var/lib/apt/lists/"*
 
 # Install ffmpeg.
-RUN apt update && \
+RUN apt-get update && \
     # On nvidia-jetson we need to install a patched version of ffmpeg to support the Jetson's video encoding/decoding capabilities.
     if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
         # The nvidia-jetson base image we use comes with an NVIDIA accelerated version of OpenCV. In theory this is good, but in practice it
@@ -91,7 +91,7 @@ RUN apt update && \
         ldconfig && \
         rm -rf "${HOME}/dependencies"; \
     else \
-        apt install -y --no-install-recommends \
+        apt-get install -y --no-install-recommends \
             ffmpeg \
             libavcodec-dev \
             libavfilter-dev \
@@ -102,7 +102,7 @@ RUN apt update && \
             libswresample-dev; \
     fi && \
     \
-    apt -y autoremove && apt clean && rm -rf "/var/lib/apt/lists/"*
+    apt-get -y autoremove && apt-get clean && rm -rf "/var/lib/apt/lists/"*
 
 RUN pip install --break-system-packages --upgrade \
         pybind11[global] \
@@ -164,10 +164,10 @@ ENV COLCON_WS=${CONTAINER_REPOSITORY_MOUNT_POINT}/colcon_ws
 ENV ROS_DISTRO=kilted
 
 RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
-    sudo apt update && sudo apt install -y --no-install-recommends \
+    sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         locales \
         software-properties-common && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    sudo apt-get -y autoremove && sudo apt-get clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     \
     sudo locale-gen ${LANG} && \
     sudo update-locale LC_ALL=${LANG} LANG=${LANG} && \
@@ -175,7 +175,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
     export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}') && \
     curl -L -o "/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
     sudo dpkg -i "/tmp/ros2-apt-source.deb" && \
-    sudo apt update && sudo apt install -y --no-install-recommends \
+    sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         debhelper \
         fakeroot \
         python3-colcon-mixin \
@@ -185,7 +185,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
         ros-${ROS_DISTRO}-ros-base \
         ros-${ROS_DISTRO}-xacro \
         ros-dev-tools && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"* && \
+    sudo apt-get -y autoremove && sudo apt-get clean && sudo rm -rf "/var/lib/apt/lists/"* && \
     sudo rosdep init && \
     colcon mixin add default "https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml" && \
     colcon mixin update default && \
@@ -199,7 +199,7 @@ RUN mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/co
     cd ".." && \
     vcs import <"src/ffmpeg_image_transport/ffmpeg_image_transport.repos" && \
     source "/opt/ros/${ROS_DISTRO}/setup.bash" && \
-    sudo apt update && rosdep update && sudo -E rosdep install -y --from-paths "." --ignore-src && \
+    sudo apt-get update && rosdep update && sudo -E rosdep install -y --from-paths "." --ignore-src && \
     cd "src" && \
     \
     for package in "ffmpeg_encoder_decoder" "ffmpeg_image_transport_msgs" "ffmpeg_image_transport"; do \
@@ -215,17 +215,17 @@ RUN mkdir -p "${HOME}/dependencies/colcon_ws/src" && cd "${HOME}/dependencies/co
         # Build the package.
         fakeroot "debian/rules" binary && \
         # Install the package.
-        cd ".." && sudo apt install -y "./"*".deb" && rm "./"*".deb"; \
+        cd ".." && sudo apt-get install -y "./"*".deb" && rm "./"*".deb"; \
     done && \
     \
     rm -rf "${HOME}/dependencies" && \
     sudo rm -rf "${HOME}/.ros/rosdep/"* && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*
+    sudo apt-get -y autoremove && sudo apt-get clean && sudo rm -rf "/var/lib/apt/lists/"*
 
 # Install image_transport_plugins.
-RUN sudo apt update && sudo apt install -y --no-install-recommends \
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         ros-${ROS_DISTRO}-image-transport-plugins && \
-    sudo apt -y autoremove && sudo apt clean && sudo rm -rf "/var/lib/apt/lists/"*
+    sudo apt-get -y autoremove && sudo apt-get clean && sudo rm -rf "/var/lib/apt/lists/"*
 
 #########################################################################################################
 # Apply patches.                                                                                        #
