@@ -1,4 +1,4 @@
-# Agent - Devcontainer
+# SFG Agent - Devcontainer
 
 In order to integrate this devcontainer into your project follow the steps below:
 
