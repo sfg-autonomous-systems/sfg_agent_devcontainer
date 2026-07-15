@@ -2,13 +2,12 @@
 
 This repository incorporates or modifies third-party open-source software. The following sections provide attribution, copyright notices, and license terms for these components.
 
-## jetson-stats
+## [jetson-stats](https://github.com/rbonghi/jetson_stats)
 
-* **Repository:** [link](https://github.com/rbonghi/jetson_stats)
 * **Author:** Raffaello Bonghi
 * **License:** AGPL-3.0
 * **Modified Files in this Repository:** 
-    * `patches/nvidia-jetson/jtop_env_ignore_runtime_warnings.patch` (contains modified context lines from `jtop_env.sh`)
+    * [`jtop_env_ignore_runtime_warnings.patch`](patches/nvidia-jetson/jtop_env_ignore_runtime_warnings.patch): Contains modified lines from [`jtop_env.sh`](https://github.com/rbonghi/jetson_stats/blob/master/scripts/jtop_env.sh)
 
 ### License Notice
 
