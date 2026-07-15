@@ -6,17 +6,19 @@ SHELL ["/bin/bash", "-c"]
 USER root
 
 #########################################################################################################
-# Update and install required apt-get and pip dependencies.                                                 #
+# Update and install required apt-get and pip dependencies.                                             #
 #########################################################################################################
+ENV ROS_DISTRO=kilted
+
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
         build-essential \
         git \
         python3-pip \
-        ros-kilted-rmw-zenoh-cpp && \
+        ros-${ROS_DISTRO}-rmw-zenoh-cpp && \
     apt-get -y autoremove && apt-get clean && rm -rf "/var/lib/apt/lists/"*
 
-RUN git clone -b "kilted" --depth 1 "https://gitlab+deploy-token-37:gldt-e7yRzyyEP4y9QJgpLjRq@gitlab.hs-esslingen.de/smart-factory-grids/autonomous-systems/tools/zenoh-domain-bridge.git" && \
-    cd "zenoh-domain-bridge" && \
+RUN git clone -b "${ROS_DISTRO}" --depth 1 "https://github.com/sfg-autonomous-systems/sfg_zenoh_domain_bridge.git" && \
+    cd "sfg_zenoh_domain_bridge" && \
     pip install --break-system-packages .
 
 COPY .devcontainer/scripts/cross_domain_router_entrypoint /entrypoint

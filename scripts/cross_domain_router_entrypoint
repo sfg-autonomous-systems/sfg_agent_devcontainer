@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 sfg_agent_devcontainer__cross_domain_router_entrypoint() {
-    source "/opt/ros/kilted/setup.bash"
-    echo "Starting zenoh router..."
+    source "/opt/ros/${ROS_DISTRO}/setup.bash"
+    echo "Starting Zenoh Router..."
     ros2 run rmw_zenoh_cpp rmw_zenohd &
-    echo "Starting zenoh-domain-bridge..."
-    zenoh-domain-bridge "${@}" &
+    echo "Starting SFG Zenoh Domain Bridge..."
+    sfg-zenoh-domain-bridge "${@}" &
 
     wait -n
     exit $?
