@@ -1,6 +1,6 @@
 # Third-Party Software Notices
 
-This repository incorporates or modifies third-party open-source software. The following sections provide attribution, copyright notices, and license terms for these components.
+This software incorporates or modifies third-party open-source software. The following sections provide attribution, copyright notices, and license terms for these components.
 
 ## [jetson-stats](https://github.com/rbonghi/jetson_stats)
 
