@@ -7,7 +7,7 @@ This software incorporates or modifies third-party open-source software. The fol
 * **Author:** Raffaello Bonghi
 * **License:** AGPL-3.0
 * **Affected Directories/Files:** 
-    * [`jtop_env_ignore_runtime_warnings.patch`](patches/nvidia-jetson/jtop_env_ignore_runtime_warnings.patch): Contains modified lines from [`jtop_env.sh`](https://github.com/rbonghi/jetson_stats/blob/master/scripts/jtop_env.sh)
+    * [`jtop_env_ignore_runtime_warnings.patch`](patches/nvidia-jetson/jtop_env_ignore_runtime_warnings.patch): Contains modified lines from [`jtop_env.sh`](https://github.com/rbonghi/jetson_stats/blob/master/scripts/jtop_env.sh).
 
 ### License Notice
 
