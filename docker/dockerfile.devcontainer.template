@@ -29,7 +29,7 @@ ARG CONTAINER_REPOSITORY_MOUNT_POINT
 ENV REPOSITORY_DIRECTORY=${CONTAINER_REPOSITORY_MOUNT_POINT}
 
 #########################################################################################################
-# Update and install required apt-get and pip dependencies.                                                 #
+# Update and install required apt-get and pip dependencies.                                             #
 #########################################################################################################
 RUN export DEBIAN_FRONTEND=noninteractive && \
     # Configure apt-get to use IPv4 because otherwise apt-get operations are slow as fuck!?
