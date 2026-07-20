@@ -1,5 +1,5 @@
---- /etc/profile.d/jtop_env.sh
-+++ /etc/profile.d/jtop_env.sh
+--- /usr/local/share/jetson_stats/jtop_env.sh
++++ /usr/local/share/jetson_stats/jtop_env.sh
 @@ -31,7 +31,7 @@ if type -P python >/dev/null 2>&1 && [ -z $JETSON_VARIABLE ] ; then
  fi
  
