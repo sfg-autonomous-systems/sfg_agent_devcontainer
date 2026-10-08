@@ -17,6 +17,9 @@
     "postAttachCommand": [
         "${containerEnv:REPOSITORY_DIRECTORY}/.devcontainer/scripts/post_attach_command"
     ],
+    "remoteEnv": {
+        "DISPLAY": "${containerEnv:DISPLAY}"
+    },
     "customizations": {
         "vscode": {
             "settings": {
