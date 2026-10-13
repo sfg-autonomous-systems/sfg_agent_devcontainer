@@ -40,7 +40,7 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
-
+    
     sfg_agent_devcontainer__stop_project_service
     sfg_agent_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_agent_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
@@ -50,6 +50,7 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_agent_devcontainer__configure_firewall
     sfg_agent_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
+    sfg_agent_devcontainer__check_buildx_bake_entitlements
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 
