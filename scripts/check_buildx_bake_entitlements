@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__check_buildx_bake_entitlements() {
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Checking buildx bake entitlements."
+    local END_TEXT="< Done checking buildx bake entitlements."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+
+    # Starting with buildx v0.37.2, bake refuses to read Dockerfiles outside of the build context and the current working
+    # directory unless explicitly granted. Docker compose v5 always builds via bake and the dev containers extension builds
+    # with a generated Dockerfile in '/tmp/devcontainercli-<user>', which causes the build to fail. This check can be removed
+    # once a compose release containing https://github.com/docker/compose/pull/14325 is widely available.
+    # See https://github.com/devcontainers/cli/issues/1320 and https://github.com/docker/compose/issues/14285.
+    local MINIMUM_ENFORCING_VERSION="0.37.2"
+
+    if [[ ! -t 0 ]]; then
+        sfg_bash_utils__print_plain "No terminal available for input. Skipping buildx bake entitlements check."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    if [[ "${BUILDX_BAKE_ENTITLEMENTS_FS:-}" == "0" ]]; then
+        sfg_bash_utils__print_plain "Filesystem entitlements are disabled, nothing needs to be done."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    local buildx_version
+    buildx_version="$(docker buildx version 2>"/dev/null" | awk '{print $2}' | sed 's/^v//')"
+
+    if [[ -z "${buildx_version}" ]]; then
+        sfg_bash_utils__print_warning "Could not determine buildx version. Skipping buildx bake entitlements check."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    if [[ "$(printf '%s\n' "${MINIMUM_ENFORCING_VERSION}" "${buildx_version}" | sort -V | head -n 1)" != "${MINIMUM_ENFORCING_VERSION}" ]]; then
+        sfg_bash_utils__print_plain "Buildx version '${buildx_version}' does not enforce filesystem entitlements, nothing needs to be done."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    sfg_bash_utils__print_warning "Buildx version '${buildx_version}' enforces filesystem entitlements, which breaks dev container builds unless 'BUILDX_BAKE_ENTITLEMENTS_FS=0' is set."
+
+    local PROFILE="${HOME}/.profile"
+    local EXPORT_LINE="export BUILDX_BAKE_ENTITLEMENTS_FS=0"
+
+    if ! grep -qxF "${EXPORT_LINE}" "${PROFILE}" 2>"/dev/null"; then
+        local MESSAGE="Do you want to add '${EXPORT_LINE}' to '${PROFILE}'? [y/N] "
+        read -rp "${MESSAGE}" confirm
+
+        if [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+            sfg_bash_utils__print_error "Error: Set 'BUILDX_BAKE_ENTITLEMENTS_FS=0' in the environment VS Code is launched from and try again."
+            exit 1
+        fi
+
+        echo "${EXPORT_LINE}" >>"${PROFILE}"
+    fi
+
+    sfg_bash_utils__print_error "Error: '${EXPORT_LINE}' is in '${PROFILE}' but not yet active for VS Code."
+    sfg_bash_utils__print_error "Restart VS Code from a fresh session and try again."
+    exit 1
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__check_buildx_bake_entitlements "${@}"
+fi
