@@ -48,6 +48,7 @@ sfg_agent_devcontainer__initialize_command() {
     sfg_agent_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__copy_dependencies
     sfg_agent_devcontainer__configure_firewall
+    sfg_agent_devcontainer__configure_ssh_agent
     sfg_agent_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_agent_devcontainer__check_buildx_bake_entitlements
