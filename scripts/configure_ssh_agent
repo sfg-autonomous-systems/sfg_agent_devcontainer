@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__configure_ssh_agent() {
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Configuring SSH agent."
+    local END_TEXT="< Done configuring SSH agent."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+
+    # VS Code only forwards the SSH agent into the container if 'SSH_AUTH_SOCK' is set in its environment. On native Linux
+    # the desktop session usually provides an agent, whereas on WSL there is none. Therefore, we start an agent from the
+    # login profile, which VS Code sources when resolving its environment. The snippet is adapted from
+    # https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials#_using-a-ssh-agent.
+    if [[ ! -t 0 ]]; then
+        sfg_bash_utils__print_plain "No terminal available for input. Skipping SSH agent configuration."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    if ! grep -qi "microsoft" "/proc/sys/kernel/osrelease" 2>"/dev/null"; then
+        sfg_bash_utils__print_plain "Not running on WSL, nothing needs to be done."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    if [[ -n "${SSH_AUTH_SOCK:-}" ]]; then
+        sfg_bash_utils__print_plain "SSH agent is available, nothing needs to be done."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    local PROFILE="${HOME}/.profile"
+    local MARKER="# Start SSH agent for forwarding into dev containers."
+
+    if ! grep -qxF "${MARKER}" "${PROFILE}" 2>"/dev/null"; then
+        local MESSAGE="No SSH agent detected. Do you want to auto start one on login via '${PROFILE}'? [y/N] "
+
+        read -rp "${MESSAGE}" confirm
+
+        if [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+            sfg_bash_utils__print_info "${END_TEXT}"
+            return 0
+        fi
+
+        printf '\n%s\n' "${MARKER}" >>"${PROFILE}"
+        cat <<"EOF" >>"${PROFILE}"
+# The line above marks this block as added by the agent devcontainer, do not modify it. The rest may be adjusted.
+# See https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials#_using-a-ssh-agent.
+if [ -z "${SSH_AUTH_SOCK}" ]; then
+    # Check for a currently running instance of the agent.
+    RUNNING_AGENT="$(ps -ax | grep 'ssh-agent -s' | grep -v grep | wc -l | tr -d '[:space:]')"
+
+    if [ "${RUNNING_AGENT}" = "0" ]; then
+        # Launch a new instance of the agent.
+        ssh-agent -s >"${HOME}/.ssh/ssh-agent" 2>&1
+    fi
+
+    eval "$(cat "${HOME}/.ssh/ssh-agent")" >"/dev/null"
+    ssh-add 2>"/dev/null"
+fi
+EOF
+    fi
+
+    sfg_bash_utils__print_warning "The SSH agent is configured in '${PROFILE}' but not yet active for VS Code. Restart VS Code from a fresh session to use git over SSH inside the container."
+    sfg_bash_utils__print_warning "Keys protected by a passphrase have to be added manually with 'ssh-add'."
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__configure_ssh_agent "${@}"
+fi
