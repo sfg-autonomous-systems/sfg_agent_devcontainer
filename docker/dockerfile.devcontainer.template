@@ -105,7 +105,6 @@ RUN apt-get update && \
     apt-get -y autoremove && apt-get clean && rm -rf "/var/lib/apt/lists/"*
 
 RUN pip install --break-system-packages --upgrade \
-        pybind11[global] \
         pybind11-stubgen && \
     \
     if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
@@ -181,6 +180,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
         python3-colcon-mixin \
         ros-${ROS_DISTRO}-diagnostic-updater \
         ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-pybind11-vendor \
         ros-${ROS_DISTRO}-rmw-zenoh-cpp \
         ros-${ROS_DISTRO}-ros-base \
         ros-${ROS_DISTRO}-xacro \
