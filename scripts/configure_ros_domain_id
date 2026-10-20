@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__configure_ros_domain_id() {
+    local environment_file="${1}"
+
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
+    source "${SCRIPT_DIR}/bash_utils/common"
+
+    local START_TEXT="> Configure ROS domain ID."
+    local END_TEXT="< Done configuring ROS domain ID."
+
+    sfg_bash_utils__print_info "${START_TEXT}"
+    local ros_domain_id_override
+    ros_domain_id_override="$(sfg_bash_utils__get_environment_variable "${environment_file}" "ROS_DOMAIN_ID_OVERRIDE")"
+
+    local default_interface
+    default_interface="$(ip route | grep '^default' | awk '{print $5}' | head -n 1)"
+    local ip_address
+    ip_address="$(ip -4 addr show dev "${default_interface}" | awk '/inet / {print $2}' | cut -d/ -f1 | head -n 1)"
+    local ros_domain_id
+    ros_domain_id="${ip_address##*.}"
+
+    if [[ ! -t 0 ]]; then
+        if [[ -n "${ros_domain_id_override}" ]]; then
+            ros_domain_id="${ros_domain_id_override}"
+        fi
+
+        sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID" "${ros_domain_id}"
+        sfg_bash_utils__print_plain "Using ROS domain ID '${ros_domain_id}'."
+        sfg_bash_utils__print_info "${END_TEXT}"
+        return 0
+    fi
+
+    if [[ -n "${ros_domain_id_override}" ]]; then
+        sfg_bash_utils__print_plain "Custom ROS domain ID override '${ros_domain_id_override}' is currently active."
+        local message="Would you like to (k)eep it, (c)hange it, or (d)isable the override to use the IP-based ID? [K/c/d] "
+        read -rp "${message}" choice
+
+        case "${choice}" in
+            [Cc]* )
+                ;;
+            [Dd]* )
+                sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID_OVERRIDE" ""
+                sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID" "${ros_domain_id}"
+                sfg_bash_utils__print_info "${END_TEXT}"
+                return 0
+                ;;
+            * )
+                sfg_bash_utils__print_info "${END_TEXT}"
+                return 0
+                ;;
+        esac
+    else
+        local message="Would you like to override the IP-based ROS domain ID '${ros_domain_id}'? [y/N] "
+        read -rp "${message}" confirm
+
+        if [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+            sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID" "${ros_domain_id}"
+            sfg_bash_utils__print_info "${END_TEXT}"
+            return 0
+        fi
+    fi
+
+    # Ask the user for a domain ID.
+    read -rp "Enter a ROS domain ID in the range [1-101] or [215-232]: " ros_domain_id_override
+
+    # Validate input.
+    if [[ -z "${ros_domain_id_override}" ]]; then
+        sfg_bash_utils__print_error "Error: ROS domain ID configuration canceled."
+        exit 1
+    fi
+
+    if ! [[ "${ros_domain_id_override}" =~ ^[0-9]+$ ]]; then
+        sfg_bash_utils__print_error "Error: Invalid input. Please enter an integer."
+        exit 1
+    fi
+
+    if ! { [[ "${ros_domain_id_override}" -ge 1 && "${ros_domain_id_override}" -le 101 ]] || [[ "${ros_domain_id_override}" -ge 215 && "${ros_domain_id_override}" -le 232 ]]; }; then
+        sfg_bash_utils__print_error "Error: ROS domain ID must be between 1-101 or 215-232."
+        exit 1
+    fi
+
+    # Save the chosen ROS domain ID.
+    sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID" "${ros_domain_id_override}"
+    sfg_bash_utils__set_environment_variable "${environment_file}" "ROS_DOMAIN_ID_OVERRIDE" "${ros_domain_id_override}"
+    sfg_bash_utils__print_info "${END_TEXT}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    set -e
+    sfg_agent_devcontainer__configure_ros_domain_id "${@}"
+fi

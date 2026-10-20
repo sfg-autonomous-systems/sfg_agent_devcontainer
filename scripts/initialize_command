@@ -7,51 +7,37 @@ sfg_agent_devcontainer__initialize_command() {
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>"/dev/null" && pwd)"
     source "${SCRIPT_DIR}/bash_utils/common"
-    source "${SCRIPT_DIR}/bash_utils/get_platform"
-    source "${SCRIPT_DIR}/get_project_name"
 
     local START_TEXT="> Invoking initialize command for agent devcontainer."
     local END_TEXT="< Done invoking initialize command for agent devcontainer."
 
     sfg_bash_utils__print_info "${START_TEXT}"
-
-    # Source all scripts.
-    for script in "${SCRIPT_DIR}/bash_utils/"* "${SCRIPT_DIR}/"*; do
-        if [[ -d "${script}" ]]; then
-            continue
-        fi
-
-        if [[ "${BASH_SOURCE[0]}" == "${script}" ]]; then
-            continue
-        fi
-
-        # shellcheck disable=SC1090
-        source "${script}"
-    done
+    sfg_bash_utils__source_scripts "${SCRIPT_DIR}/bash_utils/"
+    sfg_bash_utils__source_scripts "${SCRIPT_DIR}/"
 
     local DEVCONTAINER_USER_DIRECTORY
     DEVCONTAINER_USER_DIRECTORY="$(realpath "${SCRIPT_DIR}/../../.devcontainer_user")"
     local ENVIRONMENT_FILE="${DEVCONTAINER_USER_DIRECTORY}/.env"
 
+    sfg_bash_utils__check_buildx_bake_entitlements
     sfg_bash_utils__set_up_mounted_directory "${ENVIRONMENT_FILE}" "${container_workspace_directory}"
-    sfg_bash_utils__configure_ros_domain_id "${ENVIRONMENT_FILE}"
     sfg_bash_utils__set_up_repository "${ENVIRONMENT_FILE}" "${local_workspace_directory}" "${container_workspace_directory}"
     sfg_bash_utils__set_up_ntp "${ENVIRONMENT_FILE}"
     sfg_bash_utils__forward_environment_variables "${ENVIRONMENT_FILE}" "${@}"
     sfg_bash_utils__forward_user "${ENVIRONMENT_FILE}"
-    sfg_bash_utils__forward_platform "${ENVIRONMENT_FILE}"
+    sfg_bash_utils__forward_timezone "${ENVIRONMENT_FILE}"
+    sfg_bash_utils__configure_ssh_agent
     
+    sfg_agent_devcontainer__configure_ros_domain_id "${ENVIRONMENT_FILE}"
+    sfg_agent_devcontainer__forward_platform "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__stop_project_service
     sfg_agent_devcontainer__configure_project_as_service "${DEVCONTAINER_USER_DIRECTORY}"
     sfg_agent_devcontainer__forward_project_name "${ENVIRONMENT_FILE}"
-    sfg_agent_devcontainer__forward_timezone "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__forward_jtop_gid "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__copy_dependencies
     sfg_agent_devcontainer__configure_firewall
-    sfg_agent_devcontainer__configure_ssh_agent
     sfg_agent_devcontainer__execute_user_initialize_command "${DEVCONTAINER_USER_DIRECTORY}" "${ENVIRONMENT_FILE}"
     sfg_agent_devcontainer__instantiate_devcontainer_dockerfile_template "${DEVCONTAINER_USER_DIRECTORY}"
-    sfg_agent_devcontainer__check_buildx_bake_entitlements
     sfg_bash_utils__print_info "${END_TEXT}"
 }
 
