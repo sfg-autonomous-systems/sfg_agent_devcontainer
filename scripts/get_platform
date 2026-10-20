@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+sfg_agent_devcontainer__get_platform() {
+    if [ -f "/etc/nv_tegra_release" ]; then
+        echo "nvidia-jetson"
+        return
+    fi
+
+    if command -v nvidia-smi &>/dev/null; then
+        echo "nvidia"
+        return
+    fi
+
+    if [ -f "/sys/devices/virtual/dmi/id/board_vendor" ] && grep -qi "Valve" "/sys/devices/virtual/dmi/id/board_vendor"; then
+        echo "steamdeck"
+        return
+    fi
+
+    if command -v rocm-smi &>/dev/null; then
+        echo "amd"
+        return
+    fi
+
+    echo "generic"
+}
