@@ -180,6 +180,7 @@ RUN --mount=type=bind,source=".devcontainer/config",target="/tmp/config",ro \
         python3-colcon-mixin \
         ros-${ROS_DISTRO}-diagnostic-updater \
         ros-${ROS_DISTRO}-magic-enum \
+        ros-${ROS_DISTRO}-nav-msgs \
         ros-${ROS_DISTRO}-pybind11-vendor \
         ros-${ROS_DISTRO}-rmw-zenoh-cpp \
         ros-${ROS_DISTRO}-ros-base \
