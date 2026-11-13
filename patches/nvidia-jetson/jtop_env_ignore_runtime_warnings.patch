@@ -1,13 +1,11 @@
 --- /usr/local/share/jetson_stats/jtop_env.sh
 +++ /usr/local/share/jetson_stats/jtop_env.sh
-@@ -31,7 +31,7 @@ if type -P python >/dev/null 2>&1 && [ -z $JETSON_VARIABLE ] ; then
- fi
+@@ -51,7 +51,7 @@
  
  # Load variables only if not empty the variable
-- if [ ! -z $JETSON_VARIABLE ] ; then
--     eval $($JETSON_PYTHON_NAME -m jtop.core.jetson_variables)
-- fi
-+if [ ! -z $JETSON_VARIABLE ] ; then
-+    eval $($JETSON_PYTHON_NAME -W ignore::RuntimeWarning -m jtop.core.jetson_variables)
-+fi
+ if [ -n "$JETSON_VARIABLE" ]; then
+-    eval "$("$JETSON_PYTHON_NAME" -m jtop.core.jetson_variables)"
++    eval "$("$JETSON_PYTHON_NAME" -W ignore::RuntimeWarning -m jtop.core.jetson_variables)"
+ fi
+ 
  # EOF
