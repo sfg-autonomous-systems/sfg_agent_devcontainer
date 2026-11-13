@@ -109,7 +109,7 @@ RUN pip install --break-system-packages --upgrade \
     \
     if [[ ${PLATFORM} == "nvidia-jetson" ]]; then \
         pip install --break-system-packages \
-            jetson-stats; \
+            jetson-stats==7.2.2; \
     fi
 
 #########################################################################################################
