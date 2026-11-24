@@ -85,7 +85,7 @@ The host side scripts run inside the WSL2 distribution, so most of the setup wor
 
 ## Known Issues
 
-1. Docker Buildx >= 0.37.2 refuses to read the Dockerfile the Dev Containers extension generates in `/tmp`, which fails the build with `additional privileges requested: pass "--allow=fs.read=..."`. To work around this, add the following to `~/.profile` on the host and start a fresh session so VS Code picks it up:
+1. Docker Buildx >= 0.37.2 refuses to read the Dockerfile the Dev Containers extension generates in `/tmp`, which fails the build with `additional privileges requested: pass "--allow=fs.read=..."`. To work around this, add the following to your login profile on the host and start a fresh session so VS Code picks it up:
 
    ```bash
    export BUILDX_BAKE_ENTITLEMENTS_FS=0
